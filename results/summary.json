@@ -1,0 +1,62 @@
+{
+  "iemocap": {
+    "paired": {
+      "delta_auc": -0.009379122392473516,
+      "ci_low": -0.07848689636374838,
+      "ci_high": 0.06241322126011374,
+      "p_value": 0.761,
+      "beats_baseline": false
+    },
+    "leak_gap": 0.03090562838616706
+  },
+  "meld": {
+    "paired": {
+      "delta_auc": -0.141660633597124,
+      "ci_low": -0.17461237001460192,
+      "ci_high": -0.1084830960799556,
+      "p_value": 0.0,
+      "beats_baseline": false
+    },
+    "leak_gap": 0.19811226073552257
+  },
+  "emorynlp": {
+    "paired": {
+      "delta_auc": -0.11281873647876706,
+      "ci_low": -0.17517644056265003,
+      "ci_high": -0.039597928195847475,
+      "p_value": 0.0,
+      "beats_baseline": false
+    },
+    "leak_gap": 0.10224077720249247
+  },
+  "dailydialog": {
+    "paired": {
+      "delta_auc": 0.03966050606805749,
+      "ci_low": 0.016758396659636535,
+      "ci_high": 0.061487081615146634,
+      "p_value": 0.002,
+      "beats_baseline": true
+    },
+    "leak_gap": 0.08116588321593676
+  },
+  "iemocap_mm": {
+    "paired": {
+      "delta_auc": -0.08410123589225693,
+      "ci_low": -0.14018922997585326,
+      "ci_high": -0.021006428282982898,
+      "p_value": 0.005,
+      "beats_baseline": false
+    },
+    "leak_gap": 0.020925982300523782
+  },
+  "meld_mm": {
+    "paired": {
+      "delta_auc": 0.03817476762280414,
+      "ci_low": 0.007585980683720442,
+      "ci_high": 0.06883582681077187,
+      "p_value": 0.021,
+      "beats_baseline": true
+    },
+    "leak_gap": -0.0019748373718966317
+  }
+}
