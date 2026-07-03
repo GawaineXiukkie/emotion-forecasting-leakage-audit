@@ -22,6 +22,8 @@ architecture, though we report that as a hypothesis rather than a settled conclu
 dose-response sweep separates two distinct leakage mechanisms with different inflation
 profiles. Details in `docs/findings.md`.
 
+![Leakage dose-response curve](results/figures/leakage_dose_response.png)
+
 ## Setup
 
 ```bash
@@ -86,6 +88,8 @@ Emotion labels are converted to shift labels (`1[y_{n+1} != y_n]`, speaker-align
   (`src/baselines.py`).
 - **One fixed hyperparameter configuration** across all six models — no per-model tuning, so
   unequal tuning effort can't explain why some models do better than others.
+- **Three fixed seeds (0, 1, 2)** for every model/dataset/config combination, averaged and
+  reported with standard deviation (`src/train.py` default `--seeds 0 1 2`).
 - **Metrics**: shift-AUC as the primary, threshold-free metric, plus F1/precision/recall/
   balanced accuracy with automatic flagging of degenerate (near-constant) predictors
   (`src/evaluate.py`).
