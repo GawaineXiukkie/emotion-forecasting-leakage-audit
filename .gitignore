@@ -1,0 +1,19 @@
+# Raw feature files (GBs; re-download via README instructions, not committed)
+data/
+
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Raw run logs (kept locally for audit; not needed to reproduce, see README)
+logs/
+results_*.log
+results_*.txt
+
+# OS
+.DS_Store
+
+# Local tooling config (not part of the research artifact)
+.claude/
+
