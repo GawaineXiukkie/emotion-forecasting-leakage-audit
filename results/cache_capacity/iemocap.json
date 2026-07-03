@@ -1,0 +1,17 @@
+{
+  "gru": [
+    0.621,
+    0.009
+  ],
+  "gru_wide": [
+    0.645,
+    0.002
+  ],
+  "gru_leaky": [
+    0.651,
+    0.01
+  ],
+  "capacity_gap": 0.024,
+  "leakage_gap_raw": 0.03,
+  "leakage_gap_controlled": 0.006
+}

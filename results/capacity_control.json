@@ -1,0 +1,70 @@
+{
+  "iemocap": {
+    "gru": [
+      0.621,
+      0.009
+    ],
+    "gru_wide": [
+      0.645,
+      0.002
+    ],
+    "gru_leaky": [
+      0.651,
+      0.01
+    ],
+    "capacity_gap": 0.024,
+    "leakage_gap_raw": 0.03,
+    "leakage_gap_controlled": 0.006
+  },
+  "meld": {
+    "gru": [
+      0.554,
+      0.013
+    ],
+    "gru_wide": [
+      0.555,
+      0.008
+    ],
+    "gru_leaky": [
+      0.752,
+      0.001
+    ],
+    "capacity_gap": 0.001,
+    "leakage_gap_raw": 0.198,
+    "leakage_gap_controlled": 0.197
+  },
+  "emorynlp": {
+    "gru": [
+      0.511,
+      0.009
+    ],
+    "gru_wide": [
+      0.54,
+      0.013
+    ],
+    "gru_leaky": [
+      0.617,
+      0.005
+    ],
+    "capacity_gap": 0.029,
+    "leakage_gap_raw": 0.106,
+    "leakage_gap_controlled": 0.077
+  },
+  "dailydialog": {
+    "gru": [
+      0.7333468211354551,
+      0.007086708007112717
+    ],
+    "gru_wide": [
+      0.7290669703290963,
+      0.010602118182391092
+    ],
+    "gru_leaky": [
+      0.8189449677831643,
+      0.0029215546628162154
+    ],
+    "capacity_gap": -0.0042798508063588425,
+    "leakage_gap_raw": 0.08559814664770915,
+    "leakage_gap_controlled": 0.08987799745406799
+  }
+}
