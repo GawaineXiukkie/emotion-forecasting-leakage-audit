@@ -23,8 +23,8 @@ whether the model's win there survives:
 
 | split | test size | transition AUC | GRU AUC | ΔAUC | p |
 |---|---|---|---|---|---|
-| original | 1000 | 0.695 | 0.732±0.002 | +0.038 [0.014, 0.060] | 0.003 |
-| deduplicated | 866 | 0.697 | 0.728±0.003 | +0.031 [0.005, 0.056] | 0.02 |
+| original | 1000 | 0.695 | 0.733±0.005 | +0.045 [0.022, 0.067] | <.001 |
+| deduplicated | 866 | 0.697 | 0.728±0.005 | +0.038 [0.013, 0.062] | 0.003 |
 
 The win holds after deduplication, so it isn't an artifact of the duplicate dialogues.
 

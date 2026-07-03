@@ -19,4 +19,4 @@ degenerate floor of a constant "always shift" predictor on this dataset.
 
 Reproduce: dialogue/utterance counts via `src.dataset.load_cosmic` / `load_mmdfn` on each
 of the six feature files; shift rate and transition-BA read from `results/benchmark_table.md`
-(test split, val-tuned threshold). Full derivation and cross-checks: `docs/e2_data_stats_degeneracy.md`.
+(test split, val-tuned threshold).
