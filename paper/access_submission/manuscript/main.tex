@@ -1,5 +1,11 @@
 \documentclass{ieeeaccess}
 
+% xdvipdfmx (the XeTeX/Tectonic PDF driver) only picks up the class's
+% \paperwidth/\paperheight from the second shipped page onward; without an
+% explicit papersize special the first (title) page falls back to US Letter
+% while every later page is the correct 203.2mm x 276.2mm IEEE Access size.
+\special{pdf:pagesize width 203.2mm height 276.2mm}
+
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
@@ -34,11 +40,11 @@
 Malaysia (e-mail: wenbin@student.usm.my; tienping@usm.my)}
 \address[2]{School of Mathematical Sciences, Universiti Sains Malaysia, 11800 Gelugor, Penang,
 Malaysia (e-mail: zhangdaiqiao24@student.usm.my)}
+\tfootnote{This work was carried out using the authors' own computing resources; no external
+funding was received for this research.}
 \markboth{Wen \headeretal: Information-Matched Auditing of Conversational Emotion-Shift Forecasting}
 {Wen \headeretal: Information-Matched Auditing of Conversational Emotion-Shift Forecasting}
 \corresp{Corresponding author: Tien-Ping Tan (e-mail: tienping@usm.my).}
-This work was carried out using the authors' own computing resources; no external funding was
-received for this research.
 
 \begin{abstract}
 Emotion-shift forecasting predicts whether the next conversational utterance will express a
@@ -1048,17 +1054,32 @@ Analysis, and Theory}, vol. 3, no. 5, 2020.
 \end{thebibliography}
 
 \begin{IEEEbiographynophoto}{Bin Wen}
-is with the School of Computer Sciences, Universiti Sains Malaysia, Penang, Malaysia. His current
-research focuses on conversational affective computing, multimodal machine learning, and reliable
-evaluation protocols for predictive systems.
+received the B.Eng. degree in software engineering from Southern College of Sun Yat-sen
+University, Guangzhou, China, in 2023. He is currently pursuing the M.Sc. degree in computer
+science with Universiti Sains Malaysia, George Town, Malaysia.
+
+His current research interests include multimodal sentiment analysis, multimodal large language
+models, affective computing, speech enhancement, conversational emotion forecasting, and
+human-computer interaction. His work focuses on parameter-efficient adaptation, discriminative
+hidden-state readout, multimodal fusion, efficient speech enhancement, controlled comparisons,
+ablation studies, and benchmark evaluation.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Dai-Qiao Zhang}
-is with the School of Mathematical Sciences, Universiti Sains Malaysia, Penang, Malaysia.
+received the B.S. degree in mathematics and applied mathematics from Jimei University, China, in
+2024. She is currently pursuing the Master's degree with the School of Mathematical Sciences,
+Universiti Sains Malaysia.
+
+Her research interests include topological data analysis and educational data mining.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Tien-Ping Tan}
-is with the School of Computer Sciences, Universiti Sains Malaysia, Penang, Malaysia.
+received the Ph.D. degree from Universit\'e Joseph Fourier, France, in 2008. He is currently an
+Associate Professor with the School of Computer Sciences, Universiti Sains Malaysia, George Town,
+Malaysia.
+
+His research interests include automatic speech recognition, machine translation, and natural
+language processing. Dr. Tan is the corresponding author of this article.
 \end{IEEEbiographynophoto}
 
 \EOD
