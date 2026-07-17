@@ -1,0 +1,52 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h64_lr1e3_d10_focal",
+    "hidden": 64,
+    "lr": 0.001,
+    "dropout": 0.1,
+    "loss": "focal"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0671479884712469,
+      "val_auc": 0.5691544227886057
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.06347876414656639,
+      "val_auc": 0.5837721139430285
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06247838941358384,
+      "val_auc": 0.5767796101949025
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.06230677061137699,
+      "val_auc": 0.5627136431784108
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.062115185849723364,
+      "val_auc": 0.5702008995502249
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.06120586058213597,
+      "val_auc": 0.5613343328335831
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06120651765238671,
+      "val_auc": 0.5739010494752623
+    }
+  ],
+  "best_val_auc": 0.5837721139430285,
+  "best_epoch": 2,
+  "epochs_ran": 7,
+  "test_evaluated": false
+}

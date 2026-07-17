@@ -1,0 +1,29 @@
+{
+  "erc": {
+    "method": "train-only StandardScaler + RidgeClassifier(lsqr)",
+    "selected_alpha": 1000.0,
+    "training_seed": 2,
+    "val_macro_f1": 0.49891083631253025,
+    "val_accuracy": 0.5239567233384853,
+    "test_macro_f1": 0.5294137097737931,
+    "test_accuracy": 0.5495995070856439
+  },
+  "metrics": {
+    "base_rate": 0.42902010050251255,
+    "weighted_f1": 0.25760064056546467,
+    "macro_f1": 0.30021978021978024,
+    "shift_f1": 0.6004395604395605,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.42902010050251255,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.5763867748414666,
+    "shift_pr_auc": 0.4745981723408876,
+    "brier": 0.24225177020197664,
+    "ece10": 0.0391467779937461
+  },
+  "threshold": 0.0,
+  "speaker_scope": "dialogue-qualified-local-roles-v1"
+}

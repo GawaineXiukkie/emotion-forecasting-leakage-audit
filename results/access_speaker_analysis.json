@@ -1,0 +1,602 @@
+{
+  "iemocap": {
+    "immediate": {
+      "n": 1592,
+      "shift_rate": 0.42902010050251255,
+      "global_transition_auc": 0.6417217124347867,
+      "speaker_transition_auc": 0.6417217124347867,
+      "same_speaker": {
+        "n": 442,
+        "fraction": 0.2776381909547739,
+        "shift_rate": 0.22171945701357465,
+        "global_transition_auc": 0.6400688182249643,
+        "speaker_transition_auc": 0.6400688182249643
+      },
+      "speaker_switch": {
+        "n": 1150,
+        "fraction": 0.7223618090452262,
+        "shift_rate": 0.508695652173913,
+        "global_transition_auc": 0.6272309205052569,
+        "speaker_transition_auc": 0.6272309205052569
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 1592,
+          "fraction": 1.0,
+          "shift_rate": 0.42902010050251255,
+          "global_transition_auc": 0.6417217124347867,
+          "speaker_transition_auc": 0.6417217124347867
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": {
+        "difference": 0.28697619516033834,
+        "ci_low": 0.19901468817347084,
+        "ci_high": 0.3706265041758958,
+        "p_value": 0.0,
+        "bootstrap_dialogue_clusters": 5000
+      }
+    },
+    "self_shift": {
+      "n": 1561,
+      "shift_rate": 0.2626521460602178,
+      "global_transition_auc": 0.5856159013371194,
+      "speaker_transition_auc": 0.5856159013371194,
+      "same_speaker": {
+        "n": 1561,
+        "fraction": 1.0,
+        "shift_rate": 0.2626521460602178,
+        "global_transition_auc": 0.5856159013371194,
+        "speaker_transition_auc": 0.5856159013371194
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 1.9750160153747598,
+      "gap_median": 2.0,
+      "gap_p90": 3.0,
+      "horizon": {
+        "gap_1": {
+          "n": 442,
+          "fraction": 0.28315182575272263,
+          "shift_rate": 0.22171945701357465,
+          "global_transition_auc": 0.6536248220218319,
+          "speaker_transition_auc": 0.6536248220218319
+        },
+        "gap_2": {
+          "n": 864,
+          "fraction": 0.5534913516976298,
+          "shift_rate": 0.2337962962962963,
+          "global_transition_auc": 0.5792789626394663,
+          "speaker_transition_auc": 0.5792789626394663
+        },
+        "gap_3_plus": {
+          "n": 255,
+          "fraction": 0.16335682254964767,
+          "shift_rate": 0.43137254901960786,
+          "global_transition_auc": 0.5321316614420063,
+          "speaker_transition_auc": 0.5321316614420063
+        }
+      }
+    }
+  },
+  "meld": {
+    "immediate": {
+      "n": 2330,
+      "shift_rate": 0.58068669527897,
+      "global_transition_auc": 0.675640999454565,
+      "speaker_transition_auc": 0.675640999454565,
+      "same_speaker": {
+        "n": 565,
+        "fraction": 0.24248927038626608,
+        "shift_rate": 0.4230088495575221,
+        "global_transition_auc": 0.6301755782016069,
+        "speaker_transition_auc": 0.6301755782016069
+      },
+      "speaker_switch": {
+        "n": 1765,
+        "fraction": 0.7575107296137339,
+        "shift_rate": 0.6311614730878187,
+        "global_transition_auc": 0.7028173752850881,
+        "speaker_transition_auc": 0.7028173752850881
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 2330,
+          "fraction": 1.0,
+          "shift_rate": 0.58068669527897,
+          "global_transition_auc": 0.675640999454565,
+          "speaker_transition_auc": 0.675640999454565
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": {
+        "difference": 0.20815262353029657,
+        "ci_low": 0.15071548763680648,
+        "ci_high": 0.26548213745198196,
+        "p_value": 0.0,
+        "bootstrap_dialogue_clusters": 5000
+      }
+    },
+    "self_shift": {
+      "n": 1864,
+      "shift_rate": 0.5380901287553648,
+      "global_transition_auc": 0.6633021956198767,
+      "speaker_transition_auc": 0.6633021956198767,
+      "same_speaker": {
+        "n": 1864,
+        "fraction": 1.0,
+        "shift_rate": 0.5380901287553648,
+        "global_transition_auc": 0.6633021956198767,
+        "speaker_transition_auc": 0.6633021956198767
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 2.2054721030042916,
+      "gap_median": 2.0,
+      "gap_p90": 4.0,
+      "horizon": {
+        "gap_1": {
+          "n": 565,
+          "fraction": 0.3031115879828326,
+          "shift_rate": 0.4230088495575221,
+          "global_transition_auc": 0.6472713504633313,
+          "speaker_transition_auc": 0.6472713504633313
+        },
+        "gap_2": {
+          "n": 961,
+          "fraction": 0.5155579399141631,
+          "shift_rate": 0.5796045785639958,
+          "global_transition_auc": 0.6572759834331726,
+          "speaker_transition_auc": 0.6572759834331726
+        },
+        "gap_3_plus": {
+          "n": 338,
+          "fraction": 0.1813304721030043,
+          "shift_rate": 0.6124260355029586,
+          "global_transition_auc": 0.732658479920345,
+          "speaker_transition_auc": 0.732658479920345
+        }
+      }
+    }
+  },
+  "emorynlp": {
+    "immediate": {
+      "n": 905,
+      "shift_rate": 0.7215469613259669,
+      "global_transition_auc": 0.6084342108461558,
+      "speaker_transition_auc": 0.6084342108461558,
+      "same_speaker": {
+        "n": 82,
+        "fraction": 0.09060773480662983,
+        "shift_rate": 0.7439024390243902,
+        "global_transition_auc": 0.4652615144418423,
+        "speaker_transition_auc": 0.4652615144418423
+      },
+      "speaker_switch": {
+        "n": 823,
+        "fraction": 0.9093922651933701,
+        "shift_rate": 0.7193195625759417,
+        "global_transition_auc": 0.6205722768222768,
+        "speaker_transition_auc": 0.6205722768222768
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 905,
+          "fraction": 1.0,
+          "shift_rate": 0.7215469613259669,
+          "global_transition_auc": 0.6084342108461558,
+          "speaker_transition_auc": 0.6084342108461558
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": {
+        "difference": -0.024582876448448587,
+        "ci_low": -0.121501073520325,
+        "ci_high": 0.06624709463952784,
+        "p_value": 0.5792,
+        "bootstrap_dialogue_clusters": 5000
+      }
+    },
+    "self_shift": {
+      "n": 739,
+      "shift_rate": 0.6725304465493911,
+      "global_transition_auc": 0.591973327568718,
+      "speaker_transition_auc": 0.591973327568718,
+      "same_speaker": {
+        "n": 739,
+        "fraction": 1.0,
+        "shift_rate": 0.6725304465493911,
+        "global_transition_auc": 0.591973327568718,
+        "speaker_transition_auc": 0.591973327568718
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 2.512855209742896,
+      "gap_median": 2.0,
+      "gap_p90": 4.0,
+      "horizon": {
+        "gap_1": {
+          "n": 82,
+          "fraction": 0.11096075778078485,
+          "shift_rate": 0.7439024390243902,
+          "global_transition_auc": 0.46291959406713507,
+          "speaker_transition_auc": 0.46291959406713507
+        },
+        "gap_2": {
+          "n": 464,
+          "fraction": 0.6278755074424899,
+          "shift_rate": 0.6185344827586207,
+          "global_transition_auc": 0.5957892871906927,
+          "speaker_transition_auc": 0.5957892871906927
+        },
+        "gap_3_plus": {
+          "n": 193,
+          "fraction": 0.26116373477672533,
+          "shift_rate": 0.772020725388601,
+          "global_transition_auc": 0.6209579011592434,
+          "speaker_transition_auc": 0.6209579011592434
+        }
+      }
+    }
+  },
+  "dailydialog": {
+    "immediate": {
+      "n": 6740,
+      "shift_rate": 0.1983679525222552,
+      "global_transition_auc": 0.6911173340498526,
+      "speaker_transition_auc": 0.6911173340498526,
+      "same_speaker": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "speaker_switch": {
+        "n": 6740,
+        "fraction": 1.0,
+        "shift_rate": 0.1983679525222552,
+        "global_transition_auc": 0.6911173340498526,
+        "speaker_transition_auc": 0.6911173340498526
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 6740,
+          "fraction": 1.0,
+          "shift_rate": 0.1983679525222552,
+          "global_transition_auc": 0.6911173340498526,
+          "speaker_transition_auc": 0.6911173340498526
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": null
+    },
+    "self_shift": {
+      "n": 5740,
+      "shift_rate": 0.1799651567944251,
+      "global_transition_auc": 0.6568151160420794,
+      "speaker_transition_auc": 0.6568151160420794,
+      "same_speaker": {
+        "n": 5740,
+        "fraction": 1.0,
+        "shift_rate": 0.1799651567944251,
+        "global_transition_auc": 0.6568151160420794,
+        "speaker_transition_auc": 0.6568151160420794
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 2.0,
+      "gap_median": 2.0,
+      "gap_p90": 2.0,
+      "horizon": {
+        "gap_1": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_2": {
+          "n": 5740,
+          "fraction": 1.0,
+          "shift_rate": 0.1799651567944251,
+          "global_transition_auc": 0.6568151160420794,
+          "speaker_transition_auc": 0.6568151160420794
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      }
+    }
+  },
+  "iemocap_mm": {
+    "immediate": {
+      "n": 1592,
+      "shift_rate": 0.42902010050251255,
+      "global_transition_auc": 0.6417217124347867,
+      "speaker_transition_auc": 0.6417217124347867,
+      "same_speaker": {
+        "n": 442,
+        "fraction": 0.2776381909547739,
+        "shift_rate": 0.22171945701357465,
+        "global_transition_auc": 0.6400688182249643,
+        "speaker_transition_auc": 0.6400688182249643
+      },
+      "speaker_switch": {
+        "n": 1150,
+        "fraction": 0.7223618090452262,
+        "shift_rate": 0.508695652173913,
+        "global_transition_auc": 0.6272309205052569,
+        "speaker_transition_auc": 0.6272309205052569
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 1592,
+          "fraction": 1.0,
+          "shift_rate": 0.42902010050251255,
+          "global_transition_auc": 0.6417217124347867,
+          "speaker_transition_auc": 0.6417217124347867
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": {
+        "difference": 0.28697619516033834,
+        "ci_low": 0.19951913794488502,
+        "ci_high": 0.3726471837579858,
+        "p_value": 0.0,
+        "bootstrap_dialogue_clusters": 5000
+      }
+    },
+    "self_shift": {
+      "n": 1561,
+      "shift_rate": 0.2626521460602178,
+      "global_transition_auc": 0.59549914178551,
+      "speaker_transition_auc": 0.59549914178551,
+      "same_speaker": {
+        "n": 1561,
+        "fraction": 1.0,
+        "shift_rate": 0.2626521460602178,
+        "global_transition_auc": 0.59549914178551,
+        "speaker_transition_auc": 0.59549914178551
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 1.9750160153747598,
+      "gap_median": 2.0,
+      "gap_p90": 3.0,
+      "horizon": {
+        "gap_1": {
+          "n": 442,
+          "fraction": 0.28315182575272263,
+          "shift_rate": 0.22171945701357465,
+          "global_transition_auc": 0.6834361651637398,
+          "speaker_transition_auc": 0.6834361651637398
+        },
+        "gap_2": {
+          "n": 864,
+          "fraction": 0.5534913516976298,
+          "shift_rate": 0.2337962962962963,
+          "global_transition_auc": 0.5741714277167899,
+          "speaker_transition_auc": 0.5741714277167899
+        },
+        "gap_3_plus": {
+          "n": 255,
+          "fraction": 0.16335682254964767,
+          "shift_rate": 0.43137254901960786,
+          "global_transition_auc": 0.5451724137931034,
+          "speaker_transition_auc": 0.5451724137931034
+        }
+      }
+    }
+  },
+  "meld_mm": {
+    "immediate": {
+      "n": 2330,
+      "shift_rate": 0.58068669527897,
+      "global_transition_auc": 0.675640999454565,
+      "speaker_transition_auc": 0.675640999454565,
+      "same_speaker": {
+        "n": 565,
+        "fraction": 0.24248927038626608,
+        "shift_rate": 0.4230088495575221,
+        "global_transition_auc": 0.6301755782016069,
+        "speaker_transition_auc": 0.6301755782016069
+      },
+      "speaker_switch": {
+        "n": 1765,
+        "fraction": 0.7575107296137339,
+        "shift_rate": 0.6311614730878187,
+        "global_transition_auc": 0.7028173752850881,
+        "speaker_transition_auc": 0.7028173752850881
+      },
+      "gap_mean": 1.0,
+      "gap_median": 1.0,
+      "gap_p90": 1.0,
+      "horizon": {
+        "gap_1": {
+          "n": 2330,
+          "fraction": 1.0,
+          "shift_rate": 0.58068669527897,
+          "global_transition_auc": 0.675640999454565,
+          "speaker_transition_auc": 0.675640999454565
+        },
+        "gap_2": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        },
+        "gap_3_plus": {
+          "n": 0,
+          "fraction": 0.0,
+          "shift_rate": null,
+          "global_transition_auc": null,
+          "speaker_transition_auc": null
+        }
+      },
+      "switch_minus_same": {
+        "difference": 0.20815262353029657,
+        "ci_low": 0.15071548763680648,
+        "ci_high": 0.26548213745198196,
+        "p_value": 0.0,
+        "bootstrap_dialogue_clusters": 5000
+      }
+    },
+    "self_shift": {
+      "n": 1864,
+      "shift_rate": 0.5380901287553648,
+      "global_transition_auc": 0.6633021956198767,
+      "speaker_transition_auc": 0.6633021956198767,
+      "same_speaker": {
+        "n": 1864,
+        "fraction": 1.0,
+        "shift_rate": 0.5380901287553648,
+        "global_transition_auc": 0.6633021956198767,
+        "speaker_transition_auc": 0.6633021956198767
+      },
+      "speaker_switch": {
+        "n": 0,
+        "fraction": 0.0,
+        "shift_rate": null,
+        "global_transition_auc": null,
+        "speaker_transition_auc": null
+      },
+      "gap_mean": 2.2054721030042916,
+      "gap_median": 2.0,
+      "gap_p90": 4.0,
+      "horizon": {
+        "gap_1": {
+          "n": 565,
+          "fraction": 0.3031115879828326,
+          "shift_rate": 0.4230088495575221,
+          "global_transition_auc": 0.6472713504633313,
+          "speaker_transition_auc": 0.6472713504633313
+        },
+        "gap_2": {
+          "n": 961,
+          "fraction": 0.5155579399141631,
+          "shift_rate": 0.5796045785639958,
+          "global_transition_auc": 0.6572759834331726,
+          "speaker_transition_auc": 0.6572759834331726
+        },
+        "gap_3_plus": {
+          "n": 338,
+          "fraction": 0.1813304721030043,
+          "shift_rate": 0.6124260355029586,
+          "global_transition_auc": 0.732658479920345,
+          "speaker_transition_auc": 0.732658479920345
+        }
+      }
+    }
+  }
+}

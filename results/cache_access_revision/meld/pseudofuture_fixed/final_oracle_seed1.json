@@ -1,0 +1,84 @@
+{
+  "setting": "oracle",
+  "seed": 1,
+  "config": {
+    "id": "h64_lr1e3_d10_focal",
+    "hidden": 64,
+    "lr": 0.001,
+    "dropout": 0.1,
+    "loss": "focal"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.47070947383356854,
+    "macro_f1": 0.4204998629622565,
+    "shift_f1": 0.7316392069254398,
+    "noshift_f1": 0.10936051899907322,
+    "shift_precision": 0.5879712746858169,
+    "shift_recall": 0.9682187730968219,
+    "balanced_acc": 0.5143038594245625,
+    "frac_pred_shift": 0.9562231759656652,
+    "degenerate": false,
+    "shift_auc": 0.6314305145470734,
+    "shift_pr_auc": 0.7037279292751432,
+    "brier": 0.2428185447630818,
+    "ece10": 0.09146006161051243
+  },
+  "threshold": 0.577613890171051,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.17380351234566083,
+      "val_auc": 0.5639829141119923
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.1475705960483262,
+      "val_auc": 0.5849899794493791
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.13314431725126324,
+      "val_auc": 0.5781072198916422
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.12824037896864343,
+      "val_auc": 0.5843955400057745
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.12852673796993314,
+      "val_auc": 0.585550450924778
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.1234633753245527,
+      "val_auc": 0.5794319706516754
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.12135309725999832,
+      "val_auc": 0.5759502539105623
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.11986953042673343,
+      "val_auc": 0.5797122063893749
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.1177040534940633,
+      "val_auc": 0.5679125834338219
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.11562380330129103,
+      "val_auc": 0.5669381273459128
+    }
+  ],
+  "best_val_auc": 0.585550450924778,
+  "best_epoch": 5,
+  "epochs_ran": 10,
+  "scores_file": "final_oracle_seed1.npz"
+}

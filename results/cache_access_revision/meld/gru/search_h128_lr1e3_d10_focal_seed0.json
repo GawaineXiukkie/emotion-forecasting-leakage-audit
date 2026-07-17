@@ -1,0 +1,89 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h128_lr1e3_d10_focal",
+    "hidden": 128,
+    "lr": 0.001,
+    "dropout": 0.1,
+    "loss": "focal"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6075225379591658,
+    "shift_pr_auc": 0.6873700062592871,
+    "brier": 0.23876415379917726,
+    "ece10": 0.06227065552457719
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.07334573115363266,
+      "val_auc": 0.5889514937414019
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0647806731814688,
+      "val_auc": 0.5838881434806976
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06356326964768497,
+      "val_auc": 0.5801028380237436
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.06139798891363722,
+      "val_auc": 0.5855971568810612
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.05953457093600071,
+      "val_auc": 0.588444097216325
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0581673930088679,
+      "val_auc": 0.5929618369877206
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0558431079667626,
+      "val_auc": 0.5835888007608825
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.052513044214609894,
+      "val_auc": 0.5834529288880586
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.04968744640549024,
+      "val_auc": 0.5710036685405663
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.047128899643818535,
+      "val_auc": 0.5763451315409569
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.04374153449228316,
+      "val_auc": 0.5762856875965965
+    }
+  ],
+  "best_val_auc": 0.5929618369877206,
+  "best_epoch": 6,
+  "epochs_ran": 11,
+  "scores_file": "search_h128_lr1e3_d10_focal_seed0.npz"
+}

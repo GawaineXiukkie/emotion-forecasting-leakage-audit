@@ -1,0 +1,408 @@
+{
+  "sources": {
+    "iemocap": {
+      "source": "COSMIC",
+      "dataset": "iemocap",
+      "path": "data/feat/iemocap_features_roberta.pkl",
+      "dialogues": {
+        "train": 108,
+        "val": 12,
+        "test": 31
+      },
+      "utterances": {
+        "train": 5163,
+        "val": 647,
+        "test": 1623
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 648,
+        "1": 1084,
+        "2": 1708,
+        "3": 1103,
+        "4": 1041,
+        "5": 1849
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "arrays": 151,
+        "values": 7611392,
+        "nonfinite": 0,
+        "min": -24.900903701782227,
+        "max": 20.292570114135742,
+        "dims": [
+          1024
+        ]
+      },
+      "dialogue_duplicates": {
+        "within_train_extra": 0,
+        "within_val_extra": 0,
+        "within_test_extra": 0,
+        "val_exact_train": 0,
+        "test_exact_train": 0,
+        "val_exact_train_rate": 0.0,
+        "test_exact_train_rate": 0.0
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 1141,
+        "feature_inconsistent_occurrences": 0,
+        "max_abs_diff": 2.3365020751953125e-05,
+        "tolerance": 0.001
+      }
+    },
+    "meld": {
+      "source": "COSMIC",
+      "dataset": "meld",
+      "path": "data/feat/meld_features_roberta.pkl",
+      "dialogues": {
+        "train": 1038,
+        "val": 114,
+        "test": 280
+      },
+      "utterances": {
+        "train": 9989,
+        "val": 1109,
+        "test": 2610
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 6436,
+        "1": 1636,
+        "2": 358,
+        "3": 1002,
+        "4": 2308,
+        "5": 361,
+        "6": 1607
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "arrays": 1432,
+        "values": 14036992,
+        "nonfinite": 0,
+        "min": -20.461156845092773,
+        "max": 22.182802200317383,
+        "dims": [
+          1024
+        ]
+      },
+      "dialogue_duplicates": {
+        "within_train_extra": 0,
+        "within_val_extra": 0,
+        "within_test_extra": 0,
+        "val_exact_train": 0,
+        "test_exact_train": 1,
+        "val_exact_train_rate": 0.0,
+        "test_exact_train_rate": 0.0035714285714285713
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 1548,
+        "feature_inconsistent_occurrences": 0,
+        "max_abs_diff": 5.1975250244140625e-05,
+        "tolerance": 0.001
+      }
+    },
+    "emorynlp": {
+      "source": "COSMIC",
+      "dataset": "emorynlp",
+      "path": "data/feat/emorynlp_features_roberta.pkl",
+      "dialogues": {
+        "train": 659,
+        "val": 89,
+        "test": 79
+      },
+      "utterances": {
+        "train": 7551,
+        "val": 954,
+        "test": 984
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 2099,
+        "1": 968,
+        "2": 831,
+        "3": 3095,
+        "4": 595,
+        "5": 717,
+        "6": 1184
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "arrays": 827,
+        "values": 9716736,
+        "nonfinite": 0,
+        "min": -19.862001419067383,
+        "max": 20.573165893554688,
+        "dims": [
+          1024
+        ]
+      },
+      "dialogue_duplicates": {
+        "within_train_extra": 0,
+        "within_val_extra": 0,
+        "within_test_extra": 0,
+        "val_exact_train": 0,
+        "test_exact_train": 0,
+        "val_exact_train_rate": 0.0,
+        "test_exact_train_rate": 0.0
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 1320,
+        "feature_inconsistent_occurrences": 0,
+        "max_abs_diff": 0.00011301040649414062,
+        "tolerance": 0.001
+      }
+    },
+    "dailydialog": {
+      "source": "COSMIC",
+      "dataset": "dailydialog",
+      "path": "data/feat/dailydialog_features_roberta.pkl",
+      "dialogues": {
+        "train": 11118,
+        "val": 1000,
+        "test": 1000
+      },
+      "utterances": {
+        "train": 87170,
+        "val": 8069,
+        "test": 7740
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 12885,
+        "1": 85572,
+        "2": 1022,
+        "3": 1150,
+        "4": 174,
+        "5": 1823,
+        "6": 353
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "arrays": 13118,
+        "values": 105450496,
+        "nonfinite": 0,
+        "min": -23.80704116821289,
+        "max": 15.13709545135498,
+        "dims": [
+          1024
+        ]
+      },
+      "dialogue_duplicates": {
+        "within_train_extra": 760,
+        "within_val_extra": 6,
+        "within_test_extra": 4,
+        "val_exact_train": 101,
+        "test_exact_train": 134,
+        "val_exact_train_rate": 0.101,
+        "test_exact_train_rate": 0.134
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 22716,
+        "feature_inconsistent_occurrences": 0,
+        "max_abs_diff": 6.139278411865234e-05,
+        "tolerance": 0.001
+      }
+    },
+    "iemocap_mm": {
+      "source": "MM-DFN",
+      "dataset": "iemocap",
+      "configuration": "iemocap_mm",
+      "path": "data/feat/IEMOCAP_features.pkl",
+      "dialogues": {
+        "train": 120,
+        "val": 0,
+        "test": 31
+      },
+      "utterances": {
+        "train": 5810,
+        "val": 0,
+        "test": 1623
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 648,
+        "1": 1084,
+        "2": 1708,
+        "3": 1103,
+        "4": 1041,
+        "5": 1849
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "text": {
+          "arrays": 151,
+          "values": 743300,
+          "nonfinite": 0,
+          "min": -50.81404113769531,
+          "max": 48.675994873046875,
+          "dims": [
+            100
+          ]
+        },
+        "audio": {
+          "arrays": 151,
+          "values": 11759006,
+          "nonfinite": 0,
+          "min": -141.98489379882812,
+          "max": 176.89996337890625,
+          "dims": [
+            1582
+          ]
+        },
+        "visual": {
+          "arrays": 151,
+          "values": 2542086,
+          "nonfinite": 0,
+          "min": 0.0,
+          "max": 4.195071697235107,
+          "dims": [
+            342
+          ]
+        }
+      },
+      "dialogue_duplicates": {
+        "test_exact_train": 0
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 1141,
+        "feature_inconsistent_occurrences": 0,
+        "max_abs_diff": 0.0,
+        "tolerance": 0.001
+      }
+    },
+    "meld_mm": {
+      "source": "MM-DFN",
+      "dataset": "meld",
+      "configuration": "meld_mm",
+      "path": "data/feat/MELD_features_raw1.pkl",
+      "dialogues": {
+        "train": 1152,
+        "val": 0,
+        "test": 280
+      },
+      "utterances": {
+        "train": 11098,
+        "val": 0,
+        "test": 2610
+      },
+      "split_id_overlap": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "length_error_count": 0,
+      "length_error_examples": [],
+      "label_counts": {
+        "0": 6436,
+        "1": 1636,
+        "2": 358,
+        "3": 1002,
+        "4": 2308,
+        "5": 361,
+        "6": 1607
+      },
+      "label_range_valid": true,
+      "feature_profile": {
+        "text": {
+          "arrays": 1432,
+          "values": 8224800,
+          "nonfinite": 0,
+          "min": -0.9752063751220703,
+          "max": 0.9511410593986511,
+          "dims": [
+            600
+          ]
+        },
+        "audio": {
+          "arrays": 1432,
+          "values": 4112400,
+          "nonfinite": 0,
+          "min": -0.9999999403953552,
+          "max": 1.0,
+          "dims": [
+            300
+          ]
+        },
+        "visual": {
+          "arrays": 1432,
+          "values": 4688136,
+          "nonfinite": 0,
+          "min": 0.0,
+          "max": 3.8437700271606445,
+          "dims": [
+            342
+          ]
+        }
+      },
+      "dialogue_duplicates": {
+        "test_exact_train": 2
+      },
+      "duplicate_text_feature_consistency": {
+        "repeated_text_occurrences": 1548,
+        "feature_inconsistent_occurrences": 1547,
+        "max_abs_diff": 1.544762134552002,
+        "tolerance": 0.001
+      }
+    }
+  },
+  "cross_source": {
+    "iemocap": {
+      "dataset": "iemocap",
+      "train_ids_equal_after_cosmic_val_reunion": true,
+      "test_ids_equal": true,
+      "cosmic_train_union": 120,
+      "mmdfn_train": 120,
+      "cosmic_test": 31,
+      "mmdfn_test": 31,
+      "common_dialogues": 151,
+      "text_equal": 151,
+      "labels_equal": 151,
+      "length_equal": 151,
+      "mismatch_examples": []
+    },
+    "meld": {
+      "dataset": "meld",
+      "train_ids_equal_after_cosmic_val_reunion": true,
+      "test_ids_equal": true,
+      "cosmic_train_union": 1152,
+      "mmdfn_train": 1152,
+      "cosmic_test": 280,
+      "mmdfn_test": 280,
+      "common_dialogues": 1432,
+      "text_equal": 1432,
+      "labels_equal": 1432,
+      "length_equal": 1432,
+      "mismatch_examples": []
+    }
+  }
+}

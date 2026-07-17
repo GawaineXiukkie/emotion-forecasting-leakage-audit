@@ -1,0 +1,94 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h256_lr3e4_d30_cbce",
+    "hidden": 256,
+    "lr": 0.0003,
+    "dropout": 0.3,
+    "loss": "cb_ce"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6336031760801464,
+    "shift_pr_auc": 0.7052598789284865,
+    "brier": 0.23779761932853108,
+    "ece10": 0.06922982109334848
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5387254185748823,
+      "val_auc": 0.5889302637612731
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5159848928451538,
+      "val_auc": 0.5853445201175291
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5096139456286575,
+      "val_auc": 0.590934373885426
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.4945315411596587,
+      "val_auc": 0.5875545610489309
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.4852269436373855,
+      "val_auc": 0.5952950118038689
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.47392354047659674,
+      "val_auc": 0.5946496204079552
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.45875688755150995,
+      "val_auc": 0.5988574024694713
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.4430039046388684,
+      "val_auc": 0.5955412795733623
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.41884874213825574,
+      "val_auc": 0.5829200563868272
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.39919466322118585,
+      "val_auc": 0.5920043648839145
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.3703495408549453,
+      "val_auc": 0.5873528762377078
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.3331905151858474,
+      "val_auc": 0.5852298782248341
+    }
+  ],
+  "best_val_auc": 0.5988574024694713,
+  "best_epoch": 7,
+  "epochs_ran": 12,
+  "scores_file": "search_h256_lr3e4_d30_cbce_seed0.npz"
+}

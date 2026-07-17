@@ -1,0 +1,94 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h64_lr1e3_d10_focal",
+    "hidden": 64,
+    "lr": 0.001,
+    "dropout": 0.1,
+    "loss": "focal"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6128388258852349,
+    "shift_pr_auc": 0.6876486749563042,
+    "brier": 0.23678668324992672,
+    "ece10": 0.05127475548199832
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0720950381999666,
+      "val_auc": 0.5707255558008797
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.06441906839609146,
+      "val_auc": 0.5652460979296523
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06284462333177075,
+      "val_auc": 0.5666260466380204
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.06091602496577032,
+      "val_auc": 0.5680951612629291
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.059078761912656555,
+      "val_auc": 0.5780477759472817
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.05729965493083,
+      "val_auc": 0.5755150393179232
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.05456764149394902,
+      "val_auc": 0.5806293415309364
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.05183510775818969,
+      "val_auc": 0.5773726625791877
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.04915210717555248,
+      "val_auc": 0.5665750946857114
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.04646599055691199,
+      "val_auc": 0.5702117902817643
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.04257713303421483,
+      "val_auc": 0.5668404694373207
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.03871978469418757,
+      "val_auc": 0.5697383617248934
+    }
+  ],
+  "best_val_auc": 0.5806293415309364,
+  "best_epoch": 7,
+  "epochs_ran": 12,
+  "scores_file": "search_h64_lr1e3_d10_focal_seed0.npz"
+}

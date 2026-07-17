@@ -1,0 +1,99 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h128_lr3e4_d30_focal",
+    "hidden": 128,
+    "lr": 0.0003,
+    "dropout": 0.3,
+    "loss": "focal"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6129235536330426,
+    "shift_pr_auc": 0.6866358803596729,
+    "brier": 0.23861432914540606,
+    "ece10": 0.06158309030174698
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.07191927968101068,
+      "val_auc": 0.5735172981878089
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.06713366937456709,
+      "val_auc": 0.5773302026189304
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06586317751895297,
+      "val_auc": 0.5727148049389426
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.06427111013820677,
+      "val_auc": 0.5792621308106456
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.06282290218002869,
+      "val_auc": 0.5828245214762479
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.062171113987763725,
+      "val_auc": 0.5836949506615261
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06076001330758586,
+      "val_auc": 0.5858264406664515
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.05991353817058332,
+      "val_auc": 0.5879451926832996
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.05826706416679151,
+      "val_auc": 0.5808373953361979
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.05768299159226996,
+      "val_auc": 0.586136398376331
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.05635031132083951,
+      "val_auc": 0.5829179333888144
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.05548174272884022,
+      "val_auc": 0.5799032762105335
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.05448695531848705,
+      "val_auc": 0.5773174646308531
+    }
+  ],
+  "best_val_auc": 0.5879451926832996,
+  "best_epoch": 8,
+  "epochs_ran": 13,
+  "scores_file": "search_h128_lr3e4_d30_focal_seed0.npz"
+}

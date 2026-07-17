@@ -1,0 +1,100 @@
+{
+  "config": {
+    "id": "h128_l1e3_aux25",
+    "hidden": 128,
+    "lr": 0.001,
+    "dropout": 0.1,
+    "lambda_current": 0.25,
+    "lambda_future": 1.0
+  },
+  "best_val_auc": 0.5908069940046535,
+  "best_epoch": 9,
+  "blend_direct": 0.25,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.8830258304422551,
+      "val_auc": 0.579877800234379,
+      "blend_direct": 0.5
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.7474937944701223,
+      "val_auc": 0.581138861054026,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.7105486248478745,
+      "val_auc": 0.5855164829565719,
+      "blend_direct": 0.25
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.6663500973672578,
+      "val_auc": 0.5895353181949422,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.620552052151073,
+      "val_auc": 0.5879494386793255,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.5929534688140408,
+      "val_auc": 0.5837543946058866,
+      "blend_direct": 0.25
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.5466680454485344,
+      "val_auc": 0.5901700946007915,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.4972703854242961,
+      "val_auc": 0.5899514258054654,
+      "blend_direct": 0.25
+    },
+    {
+      "epoch": 9,
+      "train_loss": 1.4538980216690989,
+      "val_auc": 0.5908069940046535,
+      "blend_direct": 0.25
+    },
+    {
+      "epoch": 10,
+      "train_loss": 1.4037275856191462,
+      "val_auc": 0.5854443010241341,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 11,
+      "train_loss": 1.3331233118519639,
+      "val_auc": 0.5902040625689974,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 12,
+      "train_loss": 1.2759007901856394,
+      "val_auc": 0.5799329981827137,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 13,
+      "train_loss": 1.2235138452414311,
+      "val_auc": 0.5760054518588971,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 14,
+      "train_loss": 1.1511727752107563,
+      "val_auc": 0.5812004279963994,
+      "blend_direct": 0.0
+    }
+  ],
+  "max_epochs": 30
+}

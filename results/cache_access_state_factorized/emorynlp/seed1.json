@@ -1,0 +1,88 @@
+{
+  "seed": 1,
+  "config": {
+    "id": "h128_l3e4_aux25",
+    "hidden": 128,
+    "lr": 0.0003,
+    "dropout": 0.1,
+    "lambda_current": 0.25,
+    "lambda_future": 1.0
+  },
+  "metrics": {
+    "base_rate": 0.7215469613259669,
+    "weighted_f1": 0.6170409735201359,
+    "macro_f1": 0.43948293774474545,
+    "shift_f1": 0.8402061855670103,
+    "noshift_f1": 0.03875968992248062,
+    "shift_precision": 0.7252502780867631,
+    "shift_recall": 0.998468606431853,
+    "balanced_acc": 0.5091549381365614,
+    "frac_pred_shift": 0.9933701657458563,
+    "degenerate": true,
+    "shift_auc": 0.5378472981842047,
+    "shift_pr_auc": 0.7494934548533185,
+    "brier": 0.20317386870587342,
+    "ece10": 0.05864825176270633
+  },
+  "best_val_auc": 0.5997151424287857,
+  "best_epoch": 4,
+  "blend_direct": 0.0,
+  "max_epochs": 30,
+  "threshold": 0.5602455139160156,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 2.306148676645188,
+      "val_auc": 0.5782248875562219,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 2,
+      "train_loss": 2.171160959062122,
+      "val_auc": 0.5828215892053973,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.1186729101907638,
+      "val_auc": 0.595127436281859,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.0838094438825334,
+      "val_auc": 0.5997151424287857,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 5,
+      "train_loss": 2.0611795016697476,
+      "val_auc": 0.5969775112443778,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.0323144594828286,
+      "val_auc": 0.5977541229385308,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 7,
+      "train_loss": 2.0056631905691966,
+      "val_auc": 0.5940059970014993,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.9831119208108812,
+      "val_auc": 0.5972683658170914,
+      "blend_direct": 0.0
+    },
+    {
+      "epoch": 9,
+      "train_loss": 1.964131236076355,
+      "val_auc": 0.5944317841079461,
+      "blend_direct": 0.0
+    }
+  ]
+}

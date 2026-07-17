@@ -1,0 +1,84 @@
+{
+  "setting": "none",
+  "seed": 0,
+  "config": {
+    "id": "h128_lr3e4_d30_focal",
+    "hidden": 128,
+    "lr": 0.0003,
+    "dropout": 0.3,
+    "loss": "focal"
+  },
+  "metrics": {
+    "base_rate": 0.42902010050251255,
+    "weighted_f1": 0.5790484154312217,
+    "macro_f1": 0.5811400182038835,
+    "shift_f1": 0.595873786407767,
+    "noshift_f1": 0.56640625,
+    "shift_precision": 0.5088082901554404,
+    "shift_recall": 0.718887262079063,
+    "balanced_acc": 0.5987175584322708,
+    "frac_pred_shift": 0.6061557788944724,
+    "degenerate": false,
+    "shift_auc": 0.6220324814326235,
+    "shift_pr_auc": 0.5226670030974727,
+    "brier": 0.25520963082971293,
+    "ece10": 0.13441057609927712
+  },
+  "threshold": 0.5530790686607361,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.07550333440303802,
+      "val_auc": 0.6242854508574589
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.07120591029524803,
+      "val_auc": 0.6152293728358638
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.07045471295714378,
+      "val_auc": 0.5958366627737823
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.06975496374070644,
+      "val_auc": 0.6415985411928617
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.06833316572010517,
+      "val_auc": 0.6570881226053641
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.06885063461959362,
+      "val_auc": 0.637316368553691
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06647009588778019,
+      "val_auc": 0.610773044850124
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.06485895905643702,
+      "val_auc": 0.6060708504927572
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.06552337855100632,
+      "val_auc": 0.6325731964677197
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0648169219493866,
+      "val_auc": 0.6406662978671093
+    }
+  ],
+  "best_val_auc": 0.6570881226053641,
+  "best_epoch": 5,
+  "epochs_ran": 10,
+  "scores_file": "search_h128_lr3e4_d30_focal_seed0.npz"
+}

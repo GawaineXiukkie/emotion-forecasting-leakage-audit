@@ -1,0 +1,89 @@
+{
+  "setting": "oracle",
+  "seed": 0,
+  "config": {
+    "id": "h256_lr3e4_d30_cbce",
+    "hidden": 256,
+    "lr": 0.0003,
+    "dropout": 0.3,
+    "loss": "cb_ce"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6398446607523673,
+    "shift_pr_auc": 0.709949388708732,
+    "brier": 0.23970159176462566,
+    "ece10": 0.08723420442557642
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5391014715035757,
+      "val_auc": 0.5864272491040949
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5203647297440153,
+      "val_auc": 0.5918217870548073
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5164746353120515,
+      "val_auc": 0.58925295945923
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.5008980026750853,
+      "val_auc": 0.5938004212028057
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.4821582048228293,
+      "val_auc": 0.6037105759269009
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.45691753788427875,
+      "val_auc": 0.6052561184802732
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.40885339903109,
+      "val_auc": 0.596607024575825
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.3465497556960944,
+      "val_auc": 0.6039228757281884
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.2649029570095467,
+      "val_auc": 0.5856990607856791
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.19987368719144302,
+      "val_auc": 0.6025875099780906
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.13189036737788806,
+      "val_auc": 0.5898898588630921
+    }
+  ],
+  "best_val_auc": 0.6052561184802732,
+  "best_epoch": 6,
+  "epochs_ran": 11,
+  "scores_file": "final_oracle_seed0.npz"
+}

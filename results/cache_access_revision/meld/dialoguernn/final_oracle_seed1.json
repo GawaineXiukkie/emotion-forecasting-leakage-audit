@@ -1,0 +1,99 @@
+{
+  "setting": "oracle",
+  "seed": 1,
+  "config": {
+    "id": "h256_lr3e4_d30_cbce",
+    "hidden": 256,
+    "lr": 0.0003,
+    "dropout": 0.3,
+    "loss": "cb_ce"
+  },
+  "metrics": {
+    "base_rate": 0.58068669527897,
+    "weighted_f1": 0.42664626593127686,
+    "macro_f1": 0.3673635623133315,
+    "shift_f1": 0.734727124626663,
+    "noshift_f1": 0.0,
+    "shift_precision": 0.58068669527897,
+    "shift_recall": 1.0,
+    "balanced_acc": 0.5,
+    "frac_pred_shift": 1.0,
+    "degenerate": true,
+    "shift_auc": 0.6278749751301366,
+    "shift_pr_auc": 0.6871803753003455,
+    "brier": 0.2647141699538602,
+    "ece10": 0.16196602611190963
+  },
+  "threshold": 0.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5372728308041891,
+      "val_auc": 0.5891871465208309
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.523001725023443,
+      "val_auc": 0.5928917780532957
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.511814127365748,
+      "val_auc": 0.5960805210686323
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.5035199902274392,
+      "val_auc": 0.5910872297423531
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.48440080519878503,
+      "val_auc": 0.6010738123949115
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.4576244128472877,
+      "val_auc": 0.5948576742132169
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.4151695731914405,
+      "val_auc": 0.579775896329761
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.340638409058253,
+      "val_auc": 0.601201192275684
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.2653322265003667,
+      "val_auc": 0.587418689176107
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.19514938601941773,
+      "val_auc": 0.5827183715756042
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.13668279214338822,
+      "val_auc": 0.5815125087042918
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.11428682144844171,
+      "val_auc": 0.5816271505969871
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.07668540321967819,
+      "val_auc": 0.5777675402095823
+    }
+  ],
+  "best_val_auc": 0.601201192275684,
+  "best_epoch": 8,
+  "epochs_ran": 13,
+  "scores_file": "final_oracle_seed1.npz"
+}
