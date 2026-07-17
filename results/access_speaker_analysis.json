@@ -47,8 +47,8 @@
       },
       "switch_minus_same": {
         "difference": 0.28697619516033834,
-        "ci_low": 0.19901468817347084,
-        "ci_high": 0.3706265041758958,
+        "ci_low": 0.19951913794488502,
+        "ci_high": 0.3726471837579858,
         "p_value": 0.0,
         "bootstrap_dialogue_clusters": 5000
       }
@@ -249,9 +249,9 @@
       },
       "switch_minus_same": {
         "difference": -0.024582876448448587,
-        "ci_low": -0.121501073520325,
-        "ci_high": 0.06624709463952784,
-        "p_value": 0.5792,
+        "ci_low": -0.11885897691502346,
+        "ci_high": 0.0722284418065261,
+        "p_value": 0.6136,
         "bootstrap_dialogue_clusters": 5000
       }
     },

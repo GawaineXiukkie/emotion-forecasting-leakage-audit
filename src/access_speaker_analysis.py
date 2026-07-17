@@ -159,7 +159,13 @@ def switch_rate_bootstrap(dialogues: list[Dialogue], n_boot: int = 5000,
         if sampled[1] and sampled[3]:
             boot.append(sampled[2] / sampled[3] - sampled[0] / sampled[1])
     boot = np.asarray(boot)
-    p = min(1.0, 2 * min(float(np.mean(boot <= 0)), float(np.mean(boot >= 0))))
+    # Null-centered bootstrap test: the resampling distribution is centered on the
+    # *observed* statistic (sampling variability), not on 0, so testing against 0
+    # directly (e.g. 2*min(P(boot<=0), P(boot>=0))) is not a valid p-value except by
+    # coincidence. Recentering at 0 and comparing to |observed| treats the bootstrap
+    # deviations as a stand-in for the null sampling distribution instead.
+    deviations = np.abs(boot - observed)
+    p = min(1.0, float(np.mean(deviations >= abs(observed))))
     return {
         "difference": float(observed),
         "ci_low": float(np.quantile(boot, 0.025)),
