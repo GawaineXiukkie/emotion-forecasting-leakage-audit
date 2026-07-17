@@ -653,6 +653,23 @@ DailyDialog & .673 & .509 & +.164 [.141,.185] \\
 \end{tabular}
 \end{table}
 
+\textbf{Stronger predicted-label baseline.} The deployable baseline commits to the classifier's
+single most likely current label and discards its uncertainty. To test whether the headline gains
+merely exploit that discarded uncertainty, a posterior-marginalized control computes
+$P(\mathrm{shift}\mid x_n)=\sum_k P(y_n{=}k\mid x_n)\,P(y_{n+1}{\neq}k\mid y_n{=}k,\text{speaker})$,
+with the class posterior from a train-only multinomial logistic regression (same feature rows,
+scaler, and row cap as the hard baseline's classifier) and the continuation terms from the same
+train-fold transition matrix; learned-model scores are the identical cached runs behind
+Table~\ref{tab:main}. Marginalization is generally, though not uniformly, stronger: duplicate-free
+DailyDialog rises from .580 to .662 and MELD-mm from .584 to .605, while IEMOCAP dips slightly
+(.576 to .569). Every DailyDialog and MELD-mm model gain nevertheless remains
+corrected-significant in a separately declared 36-comparison Holm family ($+.078$ to $+.085$ and
+$+.111$ to $+.118$, respectively). MELD's smaller gains, including DialogueRNN's, do not survive
+against this stronger baseline, and EmoryNLP's vanish ($\Delta\leq+.030$, none significant). The
+control therefore sharpens rather than overturns the conditional conclusion: the model advantages
+that survive information matching also survive posterior marginalization exactly where they were
+large to begin with.
+
 \textbf{Same-architecture dose response (Fig.~\ref{fig:dose}).} A single-layer Transformer holds
 parameters, positional encoding, pooling, optimizer, and checkpoint rule fixed; only its attention
 mask changes so that position $n$ sees $k\in\{0,1,2,4,\mathrm{all}\}$ future utterances. A single
@@ -723,8 +740,9 @@ The revised evidence supports six bounded findings.
 \item Information matching is consequential. No-label models consistently exceed a baseline fed
 noisy train-only label predictions in point estimate, whereas a gold-label transition matrix is
 competitive or stronger on several corpora.
-\item DailyDialog is the most stable positive case: every tested model beats both matched baselines
-after duplicate removal, across every seed, with corrected-significant hierarchical inference.
+\item DailyDialog is the most stable positive case: every tested model beats the hard predicted-label,
+posterior-marginalized, and gold-label baselines after duplicate removal, across every seed, with
+corrected-significant hierarchical inference.
 \item MELD is conditional: learned models improve on the deployable predicted-label baseline, but
 most lose to the oracle gold-label baseline. The current-state observation, not only architecture,
 changes the answer.
@@ -817,22 +835,19 @@ four-configuration search favors comparability over per-model best-case tuning a
 architecture-specific graph windows or all loss families. Any larger search should apply the same
 budget to competing families and retain validation-only selection.
 
-\textbf{Information matching is imperfect in both directions.} In the oracle diagnostic, the gold
-one-hot label is concatenated to the per-turn feature vector at every position $t \le n$, so a
+\textbf{Information matching is imperfect in the oracle direction.} In the oracle diagnostic, the
+gold one-hot label is concatenated to the per-turn feature vector at every position $t \le n$, so a
 sequential or attention-based model's representation at $n$ is conditioned on the entire observed
 label history $y_1,\ldots,y_n$, not on $y_n$ alone; the transition baseline, by construction,
 conditions only on the single most recent label. ``Information-matched'' therefore means matched
 at the single quantity the title foregrounds -- current-emotion availability -- not matched in
 the total label information reaching each side, and the oracle gap likely understates the
-transition baseline's competitiveness under a strict single-label match. Symmetrically, the
-deployable regime's transition baseline consumes a hard current-label prediction from a linear
-classifier rather than the classifier's posterior, discarding calibrated uncertainty that a
-posterior-marginalized or cross-fitted baseline could exploit; this is a conservative choice for
-our headline claim (a stronger predicted-label baseline could only narrow, not widen, the
-learned-model advantage we report), but it means the deployable comparison is not the strongest
-baseline we could construct. Both limitations bound the oracle and deployable comparisons in
-opposite directions and are left as reporting caveats rather than resolved with a new baseline
-family in this submission.
+transition baseline's competitiveness under a strict single-label match. The symmetric concern on
+the deployable side -- that a hard current-label prediction discards classifier uncertainty a
+stronger baseline could exploit -- is addressed directly by the posterior-marginalized control in
+\S\ref{sec:exp}, which strengthens the baseline substantially on several corpora without
+overturning the corrected-significant DailyDialog and MELD-mm gains. The oracle-side asymmetry
+remains a reporting caveat rather than being resolved with a new model family in this submission.
 
 \section{Reproducibility Artifacts}
 \label{sec:artifact}
@@ -861,6 +876,7 @@ Joint inference & \texttt{evaluate}, \texttt{holm\_correction} & 72 corrected te
 Speaker audit & \texttt{access\_speaker\_analysis} & target/stratum JSON \\
 Full self-shift & \texttt{access\_self\_shift\_benchmark} & six-model raw scores \\
 Local feature control & \texttt{access\_local\_feature\_control} & train-only features/results \\
+Marginalized baseline & \texttt{access\_soft\_baseline} & 36 corrected tests \\
 Data/provenance audit & \texttt{access\_data\_quality} & alignment/integrity report \\
 \bottomrule
 \end{tabular}

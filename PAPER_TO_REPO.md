@@ -11,6 +11,7 @@ results remain in the repository but are not evidence for the revised manuscript
 | Table 6 full self-shift benchmark | `python -m src.access_self_shift_benchmark` | `results/access_self_shift_benchmark.{json,md}`, `results/cache_access_self_shift/` |
 | Tables 7--8 information-matched benchmark | `python -m src.access_revision_experiments` | `results/access_revision_experiments.{json,md}`, `results/cache_access_revision/` |
 | Table 9 independent local features | `python -m src.access_local_feature_control` | `results/access_local_feature_control.{json,md}` |
+| Posterior-marginalized deployable baseline | `python -m src.access_soft_baseline` | `results/access_soft_baseline.{json,md}`, `results/cache_access_soft_baseline/` |
 | Table 10 duplicate audit | `python -m src.access_data_quality` | `results/access_data_quality.{json,md}` |
 | Figure 1 speaker relation | `python -m src.access_speaker_figure` | `results/figures/access_speaker_relation.png` |
 | Figure 2 uniform leakage dose | `python -m src.access_uniform_dose_response` | `results/access_uniform_dose_response.{json,md}`, `results/figures/access_uniform_dose_response.png` |

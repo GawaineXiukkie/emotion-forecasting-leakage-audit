@@ -62,6 +62,7 @@ python -m unittest discover -s tests -v
 python -m src.access_revision_experiments
 python -m src.access_state_factorized
 python -m src.access_local_feature_control
+python -m src.access_soft_baseline
 python -m src.access_self_shift_benchmark
 python -m src.access_uniform_dose_response
 ```
@@ -107,6 +108,7 @@ mappings are listed in `docs/label_mapping.md`.
 | Structural causality | `src/check_causality.py` | `results/causality_check.md` |
 | State-factorized control | `src/access_state_factorized.py` | `results/access_state_factorized.{json,md}` |
 | Independent local features | `src/access_local_feature_control.py` | `results/access_local_feature_control.{json,md}` |
+| Marginalized deployable baseline | `src/access_soft_baseline.py` | `results/access_soft_baseline.{json,md}` |
 | Full self-shift benchmark | `src/access_self_shift_benchmark.py` | `results/access_self_shift_benchmark.{json,md}` |
 | Uniform leakage dose | `src/access_uniform_dose_response.py` | `results/access_uniform_dose_response.{json,md}` |
 | Manuscript source | — | `paper/access_submission/manuscript/` |
