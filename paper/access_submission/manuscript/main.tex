@@ -433,14 +433,14 @@ are given in Table~\ref{tab:speaker}.}
 
 A 5{,}000-sample dialogue-cluster bootstrap confirms that the switch-minus-same shift-rate
 difference is not merely an utterance-count artifact on IEMOCAP ($+0.287$, 95\% CI
-$[+0.199,+0.371]$) or MELD ($+0.208$, $[+0.151,+0.265]$); both two-sided bootstrap
+$[+0.200,+0.373]$) or MELD ($+0.208$, $[+0.151,+0.265]$); both two-sided bootstrap
 $p<.001$. EmoryNLP shows no supported difference ($-0.025$, $[-0.119,+0.072]$, $p=.614$).
 DailyDialog cannot support this contrast because its same-speaker cell is empty. Resampling whole
 dialogues is important here: treating 6{,}740 DailyDialog utterance pairs or 2{,}330 MELD pairs as
 independent would understate clustered uncertainty.
 
 The self-shift target also changes the effective sample and horizon. It removes the final
-appearance of every speaker, leaving 81.7--98.1\% as many test decisions as the immediate target,
+appearance of every speaker, leaving 80.0--98.1\% as many test decisions as the immediate target,
 and its mean gap ranges from 1.98 to 2.51 turns. The shift-rate change is largest on IEMOCAP
 (0.429 immediate to 0.263 self), confirming that the original aggregate rate partly reflects
 cross-speaker contrast rather than within-person instability.
@@ -532,10 +532,12 @@ DAG-ERC~\cite{shen2021dagerc}, plus PEC-style~\cite{altarawneh2023pec} and pseud
 forecasting strategies~\cite{xie2025pugcn}. Information matching changes the conclusion. In the
 deployable regime, all six models exceed the train-only predicted-label transition baseline on
 every primary text corpus in point estimate. The gain is decisive on duplicate-free DailyDialog
-($+0.160$ to $+0.167$ ROC--AUC; all adjusted $p=.0144$) and smaller elsewhere. DialogueRNN on
-MELD is the only other comparison that survives the 72-test familywise correction
-($\Delta=+0.041$, adjusted $p=.0352$). Positive but uncorrected differences on IEMOCAP and
-EmoryNLP are evidence of possible benefit, not conclusive wins.
+($+0.160$ to $+0.167$ ROC--AUC; all adjusted $p=.0144$) and smaller elsewhere. Among the primary
+text corpora, DialogueRNN on MELD is the only other comparison that survives the 72-test
+familywise correction ($\Delta=+0.041$, adjusted $p=.0352$); all six MELD-mm gains also survive
+but sit in a feature-source sensitivity configuration rather than a primary corpus. Positive but
+uncorrected differences on IEMOCAP and EmoryNLP are evidence of possible benefit, not conclusive
+wins.
 
 The oracle diagnostic asks a different question. When both sides receive gold $y_n$, all six
 models remain clearly better on DailyDialog ($+0.106$ to $+0.132$; adjusted $p=.0144$), whereas
@@ -562,7 +564,7 @@ from a train-only linear classifier; learned models receive no gold emotion. Bol
 matched baseline. DailyDialog is duplicate-free. MM rows are feature-source sensitivity analyses,
 not independent primary corpora. Inference uses a seed--dialogue hierarchical bootstrap and paired
 dialogue-cluster permutation; Holm correction spans 72 declared deployable+oracle comparisons.
-All six DailyDialog gains and DialogueRNN's MELD gain survive correction.}
+All six DailyDialog gains, all six MELD-mm gains, and DialogueRNN's MELD gain survive correction.}
 \label{tab:main}
 \begin{tabular}{lccccccc}\toprule
 Dataset & Trans-Pred & GRU & DRNN & DGCN & DAG-ERC & PEC & PseudoFut \\
@@ -582,7 +584,8 @@ MELD-mm      & .584 & \textbf{.723} & \textbf{.716} & \textbf{.724} & \textbf{.7
 \footnotesize
 \caption{Oracle information-matched shift ROC--AUC (three-seed mean). Both the transition baseline
 and every learned model receive gold current emotion. Bold values exceed Trans-Gold. DailyDialog
-gains survive joint Holm correction; on MELD, four of the six negative differences survive.}
+and MELD-mm gains survive joint Holm correction; on MELD, four of the six negative differences
+survive.}
 \label{tab:oracle}
 \begin{tabular}{lccccccc}\toprule
 Dataset & Trans-Gold & GRU & DRNN & DGCN & DAG-ERC & PEC & PseudoFut \\
