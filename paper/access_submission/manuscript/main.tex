@@ -638,15 +638,20 @@ DailyDialog & .673 & .509 & +.164 [.141,.185] \\
 \end{tabular}
 \end{table}
 
-\textbf{Same-architecture dose response (Fig.~\ref{fig:dose}).} A two-layer Transformer holds
+\textbf{Same-architecture dose response (Fig.~\ref{fig:dose}).} A single-layer Transformer holds
 parameters, positional encoding, pooling, optimizer, and checkpoint rule fixed; only its attention
-mask changes so that position $n$ sees $k\in\{0,1,2,4,\mathrm{all}\}$ future utterances. The response
-is not monotone. MELD rises from .630 at $k=0$ to .721 at $k=1$, then falls to
-.675/.655/.640. Duplicate-free DailyDialog similarly rises from .741 to .809 and falls to
-.791/.774/.771. The other four configurations vary by at most .033 without a consistent direction.
-Thus, exposure to the target utterance can materially inflate performance, but additional future
-context need not add signal and may dilute or complicate optimization. Because architecture is held
-fixed, this conclusion no longer relies on comparing a look-ahead GRU with a bidirectional GRU.
+mask changes so that position $n$ sees $k\in\{0,1,2,4,\mathrm{all}\}$ future utterances. A single
+layer is required for $k$ to mean what the sweep claims: with a stacked multi-layer encoder using
+the same window mask at every layer, a later layer's query at $n$ can read an earlier layer's
+output at $n+k$, which already mixed in $x_{n+2k}$, giving an effective receptive field of
+${\sim}Lk$ for $L$ layers rather than $k$. The response is not monotone. MELD rises from .620 at
+$k=0$ to .685 at $k=1$, then falls to .651/.637/.632. Duplicate-free DailyDialog similarly rises
+from .736 to .780 and falls to .774/.758/.751. The other four configurations vary by at most .022
+without a consistent direction. Thus, exposure to the target utterance can materially inflate
+performance, but additional future context need not add signal and may dilute or complicate
+optimization. Because architecture is held fixed and the receptive field is exactly $k$, this
+conclusion no longer relies on comparing a look-ahead GRU with a bidirectional GRU, nor on a
+multi-layer encoder whose effective receptive field exceeds its nominal window.
 
 \begin{figure*}[t]
 \centering
