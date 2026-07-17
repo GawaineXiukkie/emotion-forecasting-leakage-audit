@@ -36,18 +36,19 @@ This manuscript is original, has not been published, and is not under considerat
 other journal or conference. All authors have approved the manuscript and agree with its
 submission to IEEE Access.
 
-The author has disclosed the use of OpenAI Codex for language editing, LaTeX formatting,
-code review, and assistance with supplementary analyses. The author reviewed and verified
-all manuscript content, code, results, and conclusions and assumes full responsibility for
+The authors have disclosed the use of OpenAI Codex for language editing, LaTeX formatting,
+code review, and assistance with supplementary analyses. The authors reviewed and verified
+all manuscript content, code, results, and conclusions and assume full responsibility for
 the work.
 
 Thank you for your consideration.
 
 Sincerely,
 
-Bin Wen  
+Tien-Ping Tan (corresponding author)  
+on behalf of Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan  
 School of Computer Sciences  
 Universiti Sains Malaysia  
-11800 Penang, Malaysia  
-wenbin@student.usm.my  
+11800 Gelugor, Penang, Malaysia  
+tienping@usm.my  
 [INSERT ORCID]

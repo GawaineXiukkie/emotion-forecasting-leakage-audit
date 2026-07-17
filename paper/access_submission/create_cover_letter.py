@@ -45,7 +45,7 @@ def main():
         str(OUT), pagesize=A4, rightMargin=23 * mm, leftMargin=23 * mm,
         topMargin=20 * mm, bottomMargin=20 * mm,
         title="IEEE Access Cover Letter Draft - Author Action Required",
-        author="Bin Wen",
+        author="Bin Wen, Dai-Qiao Zhang, Tien-Ping Tan",
     )
     story = []
     warning_box = Table([[p(
@@ -84,15 +84,17 @@ def main():
     story += [p(x, body) for x in paragraphs]
     story += [p(
         "This manuscript is original, has not been published, and is not under consideration by "
-        "any other journal or conference. The author has approved the manuscript and agrees with "
+        "any other journal or conference. All authors have approved the manuscript and agree with "
         "its submission to IEEE Access.", body), p(
-        "The author has disclosed the use of OpenAI Codex for language editing, LaTeX formatting, "
-        "code review, and assistance with supplementary analyses. The author reviewed and verified "
-        "all content, code, results, and conclusions and assumes full responsibility.", body
+        "The authors have disclosed the use of OpenAI Codex for language editing, LaTeX formatting, "
+        "code review, and assistance with supplementary analyses. The authors reviewed and verified "
+        "all content, code, results, and conclusions and assume full responsibility.", body
     ), p("Thank you for your consideration.", body), Spacer(1, 2 * mm), p(
-        "Sincerely,<br/><br/><b>Bin Wen</b><br/>School of Computer Sciences<br/>"
-        "Universiti Sains Malaysia<br/>11800 Penang, Malaysia<br/>"
-        "wenbin@student.usm.my<br/><font color='#9A0000'>[INSERT ORCID]</font>", body
+        "Sincerely,<br/><br/><b>Tien-Ping Tan</b> (corresponding author)<br/>"
+        "on behalf of Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan<br/>"
+        "School of Computer Sciences<br/>"
+        "Universiti Sains Malaysia<br/>11800 Gelugor, Penang, Malaysia<br/>"
+        "tienping@usm.my<br/><font color='#9A0000'>[INSERT ORCID]</font>", body
     )]
     doc.build(story)
     print(f"Wrote {OUT}")

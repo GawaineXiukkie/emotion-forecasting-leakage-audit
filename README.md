@@ -1,6 +1,6 @@
 # Information-Matched Auditing of Conversational Emotion-Shift Forecasting
 
-Bin Wen, School of Computer Sciences, Universiti Sains Malaysia.
+Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan, Universiti Sains Malaysia.
 
 This repository contains the executable audit and IEEE Access manuscript for leakage-safe
 conversational emotion-shift forecasting. The task is to predict whether the next utterance will
@@ -122,7 +122,7 @@ immutable public artifact; no tag or DOI is asserted in advance.
 ```bibtex
 @article{wen2026informationmatched,
   title   = {Information-Matched Auditing of Conversational Emotion-Shift Forecasting},
-  author  = {Wen, Bin},
+  author  = {Wen, Bin and Zhang, Dai-Qiao and Tan, Tien-Ping},
   journal = {IEEE Access},
   note    = {Manuscript in preparation},
   year    = {2026}
