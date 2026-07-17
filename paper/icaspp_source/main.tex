@@ -1,0 +1,541 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{4pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{2pt}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Inertia, Leakage, and the Illusion of Progress in Conversational Emotion Forecasting}
+
+\author{
+\IEEEauthorblockN{Bin Wen}
+\IEEEauthorblockA{School of Computer Sciences, Universiti Sains Malaysia, 11800 Penang, Malaysia \\
+Email: wenbin@student.usm.my}
+}
+% NOTE: ICASSP uses single-anonymous review (authors known to reviewers,
+% reviewers anonymous to authors) -- real name/affiliation belong here, not a
+% double-blind placeholder.
+
+\maketitle
+
+\begin{abstract}
+A de-escalation agent that could tell, one turn in advance, that a customer is about to get angry
+would be worth building; a model that only \emph{appears} to do so because it peeked at the angry
+turn itself would not. Emotion-shift forecasting -- predicting whether the next utterance will
+carry a different emotion than the current one, before that utterance is observed -- is routinely
+evaluated with protocols vulnerable to exactly this failure: silent label leakage from the target
+utterance, compounded by F1 scores that degenerate to a constant ``always shift'' predictor on
+imbalanced corpora. We introduce a leakage-safe protocol (explicit commitment point, causal models,
+a strong speaker$\times$emotion transition-matrix baseline, AUC + balanced accuracy) and
+re-evaluate six causal models -- four ERC-derived architectures and two forecasting-native strategy
+baselines -- across six dataset-configurations. On 4 of 6, every safe model loses to the transition
+matrix, and the strategies designed \emph{for} forecasting fail identically to
+repurposed recognition architectures; the only way to ``win'' is to leak the future -- yet on one
+inertia-dominated multimodal case even leaking is not enough, and where safe models genuinely do
+win, the evidence implicates feature source more than architecture, though this remains a
+hypothesis pending controlled feature re-extraction. A dose--response study separates
+two operationally distinct leakage modes with very different inflation profiles. We release the
+protocol, the baseline, and an automated leakage audit as reusable tools.
+\end{abstract}
+
+\begin{IEEEkeywords}
+emotion forecasting, conversational emotion recognition, evaluation protocol, data leakage, benchmarking
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Consider a call-center assistant that flags, one turn before it happens, that a customer is about
+to escalate from neutral to angry -- giving the agent seconds to change course. This is the promise
+of \emph{forecasting} emotion in conversation, as opposed to \emph{recognizing} it: the target
+state does not yet exist when the prediction is made. It is also precisely the setting in which a
+model can look right without being right. If any feature -- a pooled dialogue embedding, a
+bidirectional encoder, a context window one utterance too wide -- depends even slightly on the turn
+being forecast, the model is not anticipating the future; it is reading it off a crib sheet built
+into its own inputs. The failure is silent because nothing in a standard run signals it happened:
+loss curves look normal, F1 looks respectable, the leaderboard entry looks like progress.
+
+Emotion recognition in conversation (ERC) has a large, mature literature (\S II). A smaller but
+growing thread reframes the task as forecasting -- predicting an upcoming emotional shift before
+the triggering utterance is seen, the setting relevant to anticipatory dialogue systems,
+de-escalation tools, and turn-taking agents. Forecasting is target-absent by construction: no
+feature may depend on utterance $n{+}1$. This constraint is easy to violate silently, e.g.\ via
+bidirectional encoders, dialogue-level pooling, or context windows not truncated at the decision
+point -- and the architectures ERC has spent a decade refining are, almost without exception, built
+to violate it, because recognition never had to enforce it in the first place.
+
+We set out to ask a narrow measurement question -- under a protocol that actually enforces the
+target-absent constraint, how much of the field's apparent progress survives -- expecting a modest
+correction: perhaps reported gains would shrink a few points once leakage was closed. We found
+instead a structured picture: most apparent progress on standard corpora is inertia in disguise;
+strategies designed natively for forecasting fail in the identical pattern as repurposed
+recognition architectures; the one comparison that seemed to favor learned models implicates
+feature source, not architecture; and leakage, measured on a dial rather than as a switch, is at
+least two operationally distinct modes with very different inflation profiles. We do
+not propose a new model. We contribute (i) a leakage-safe protocol and automated audit, (ii) a
+strong, cheap baseline -- a speaker$\times$emotion transition matrix, essentially a lookup table
+fit in seconds -- that turns out to be surprisingly hard to beat, (iii) a re-evaluation of six
+causal models -- four representative ERC-derived architectures plus two EFC-inspired strategy
+baselines -- across six dataset-configurations, and (iv) a quantification of exactly how much
+leakage inflates reported numbers, including a dose--response curve that separates those two modes.
+
+\section{Related Work}
+
+\textbf{ERC backbones.} Our four ERC-derived models are representative of three context-modeling
+paradigms: recurrent interlocutor-state tracking~\cite{majumder2019dialoguernn}, relational graph
+convolution~\cite{ghosal2019dialoguegcn,ai2023dergcn}, and directed relational
+attention~\cite{shen2021dagerc}. Knowledge-enriched encoders~\cite{zhong2019ket,ghosal2020cosmic}
+and multimodal fusion architectures~\cite{tsai2019mult,hu2021mmgcn,hazarika2020misa,li2023ga2mif,meng2024mglra}
+inform our feature choices (COSMIC RoBERTa; MM-DFN~\cite{hu2021mmdfn}-style
+text+audio+visual). All are, in original form, bidirectional or graph-connected across the full
+dialogue -- appropriate for recognition, but a direct leakage source if repurposed for forecasting
+without a causal mask; interactive memory~\cite{hazarika2018icon} and contextual-reasoning
+networks~\cite{hu2021dialoguecrn} share this property.
+
+\textbf{Emotion forecasting (EFC).} A parallel line explicitly targets an unobserved future
+utterance. Altarawneh et al.~\cite{altarawneh2023pec} formalize PEC as predicting turn $n{+}1$ from
+context strictly up to $n$, decomposing the signal into sequence, self-dependency, and recency
+terms (the strategy we re-implement as PEC-style, \S\ref{sec:exp}). Shi et
+al.~\cite{shi2023epc,shi2024epc} model bilateral-speaker correlation and word-level cues in
+text+audio. Hi-EF~\cite{wang2024hief} contributes a dedicated multimodal forecasting benchmark.
+MREPC~\cite{ju2023mrepc} pre-trains contrastively over a short-term cross-speaker window.
+PUGCN~\cite{xie2025pugcn} substitutes a pseudo-utterance-guided contrastive objective for the
+absent target (the strategy behind our Pseudo-future-style re-implementation). EDFC~\cite{lu2023edfc}
+targets a next-utterance emotion distribution; ERFC~\cite{debsharma2025erfc} shows feasibility in a
+deployed call-center setting. All are cross-speaker by design and, to our knowledge, none audits a
+leakage boundary as strict as ours. Notably EDFC and MM-DFN appeared at
+ICASSP~\cite{lu2023edfc,hu2021mmdfn} and the EPC papers at Interspeech~\cite{shi2023epc,shi2024epc},
+making this a speech-community concern as much as an NLP one.
+
+\textbf{Emotion shift and flip: adjacent, not forecasting.} ESD-ERC~\cite{gao2022esderc},
+CFN-ESA~\cite{li2024cfnesa}, and EmoShiftNet~\cite{nirujan2025emoshiftnet} use shift labels to
+sharpen \emph{recognition} of an observed current utterance -- computed over turns the model can
+already see. Emotion-flip reasoning~\cite{kumar2023efr,kumar2024ediref} runs backward: given a flip
+that has already occurred, it attributes the past trigger. Neither predicts an unobserved future
+shift under a leakage-safe protocol; we exclude both, noting our transition matrix is close in
+spirit to the inertia signal they are designed to overcome.
+
+\textbf{Leakage and the illusion of progress.} Kapoor and Narayanan~\cite{kapoor2023leakage} survey
+at least 294 papers across 17 fields and find leakage the dominant cause of irreproducible
+ML-based findings, proposing the taxonomy our 8-item audit is modeled after. Ferrari Dacrema et
+al.~\cite{dacrema2019recsys} show most neural recommenders fail to beat tuned classical baselines
+once evaluation is corrected; Lin~\cite{lin2019neuralhype} makes the same point for neural ranking.
+We view our transition-matrix result as the same phenomenon in emotion forecasting.
+
+\section{Protocol}
+
+\textbf{Commitment point.} For decision point $n$, all input features (text/audio/visual) are
+restricted to utterances $\leq n$; the target label is $\mathbb{1}[y_{n+1} \neq y_n]$. All six
+learned models (\S\ref{sec:exp}) are structurally causal, not causal-by-convention.
+
+\textbf{Causal construction and a zero-tolerance check.} DialogueRNN's global/party/emotion states
+update by chained \texttt{GRUCell} calls that never touch $x_{t+1:}$. DialogueGCN uses
+\emph{windowed} causal edges ($j{\to}i$ iff $j\leq i$ and $i-j\leq 6$); DAG-ERC uses
+\emph{unbounded} causal attention ($j\leq i$, any distance) -- two families differing sharply in
+receptive field yet still landing within the same $\lesssim$0.04 AUC band (\S\ref{sec:exp}), which
+strengthens rather than weakens Finding 4. We verified causality directly rather than trusting
+architecture alone: perturbing every input at $t\geq n$ to random noise leaves outputs at $t<n$
+changed by exactly 0.0 (floating-point identical) for every model.
+
+\textbf{Automated leakage audit.} Every experiment emits an 8-item checklist: last-utterance
+masking, model causality, per-utterance feature scope, speaker-split disjointness, val-only threshold
+tuning, dialogue-level bootstrap, train-fold-only baseline fitting, and baseline completeness.
+
+\textbf{Strong baseline.} Beyond base-rate and no-change/inertia, we fit a
+speaker$\times$emotion transition matrix $P(y_{n+1} \mid y_n, \text{speaker})$ on the train fold
+only (Laplace $\alpha{=}1.0$; a speaker's row is used only with $\geq$20 training observations,
+else global backoff). This is the baseline every model must beat.
+
+\textbf{Hyperparameters.} No per-architecture tuning: one fixed configuration (Adam, lr $10^{-3}$,
+batch 32, hidden 128, focal loss, 20 epochs, no early stopping, no LR/hidden-size/epoch search) is
+applied to all six learned models on every dataset, removing unequal tuning effort as a confound.
+The only validation-set-selected value is the binary decision threshold (grid search maximizing
+shift-F1), used only for F1/precision/recall/balanced accuracy; AUC is threshold-free.
+
+\textbf{Metrics.} We report shift-AUC as primary alongside shift-F1, precision/recall, and balanced
+accuracy, auto-flagging degenerate predictors (prediction rate $>$98\% or $<$2\% one class).
+
+\textbf{Significance.} Model-vs-baseline comparisons use a paired, cluster-robust bootstrap
+(dialogue-level resampling, $n{=}2000$), Holm--Bonferroni-corrected \emph{jointly} across all 6
+models $\times$ 6 datasets (36 comparisons, one family).
+
+\section{Experiments}
+\label{sec:exp}
+
+\textbf{Data.} Four text corpora with off-the-shelf RoBERTa features
+(IEMOCAP~\cite{busso2008iemocap}, MELD~\cite{poria2019meld}, EmoryNLP~\cite{zahiri2018emorynlp},
+DailyDialog~\cite{li2017dailydialog}; COSMIC pipeline~\cite{ghosal2020cosmic}), plus two multimodal
+configurations (IEMOCAP, MELD with MM-DFN~\cite{hu2021mmdfn}
+text+OpenSmile-audio+DenseNet-visual features). Table~\ref{tab:stats} gives size and shift-rate
+statistics (0.20--0.72) together with an F1-degeneracy analysis referenced below.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Dataset statistics and F1 degeneracy. Always-shift F1 $=2r/(1{+}r)$ for shift rate $r$
+(analytic; always-shift balanced accuracy is 0.500 by construction, omitted). Transition-BA
+$\approx$0.50 on MELD/EmoryNLP/IEMOCAP-mm shows standard F1 sits at the degenerate ceiling on
+exactly the corpora where shift is common; only IEMOCAP and DailyDialog clear it.}
+\label{tab:stats}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrcc}
+\toprule
+Dataset & \#Dial & \#Utt & Shift $r$ & Always-shift F1 & Transition BA \\
+\midrule
+IEMOCAP     & 151    & 7{,}433   & 0.429 & 0.600 & 0.611 \\
+MELD        & 1{,}432 & 13{,}708 & 0.581 & 0.735 & 0.500* \\
+EmoryNLP    & 827    & 9{,}489   & 0.722 & 0.839 & 0.500* \\
+DailyDialog & 13{,}118 & 102{,}979 & 0.198 & 0.331 & 0.681 \\
+IEMOCAP-mm  & 151    & 7{,}433   & 0.429 & 0.600 & 0.500* \\
+MELD-mm     & 1{,}432 & 13{,}708 & 0.581 & 0.735 & 0.500* \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{Main result (Table~\ref{tab:main}).} We evaluate six causal models: four ERC-derived
+architectures -- plain GRU and causal re-implementations of DialogueRNN~\cite{majumder2019dialoguernn},
+DialogueGCN~\cite{ghosal2019dialoguegcn}, and DAG-ERC~\cite{shen2021dagerc} -- and, to test whether
+inertia-dominance is an artifact of repurposing recognition architectures rather than of the task
+itself, two EFC-inspired strategy baselines: a PEC-style sequence/self-dependency/recency
+decomposition~\cite{altarawneh2023pec} (our transition matrix is close to a degenerate limit of its
+self-dependency term) and a Pseudo-future-style predict-then-classify model in the spirit of the
+pseudo-utterance-guided contrastive strategy~\cite{xie2025pugcn} (both faithful ``-style''
+re-implementations; original code is unavailable). All six sit within $\lesssim$0.04 AUC of each
+other on every dataset (max spread: EmoryNLP, 0.036). Whether any of them beats the transition
+matrix is decided by the dataset, not the model family: on 4 of 6 configurations -- IEMOCAP, MELD,
+EmoryNLP (text), and IEMOCAP-mm -- every safe model, including both EFC-inspired baselines, loses;
+only DailyDialog and MELD-multimodal see all six win. The EFC-inspired baselines reproduce the exact
+same win/loss pattern as the four ERC-derived architectures without any tuning toward this outcome
+-- the paper's central new evidence that inertia-dominance is not an ERC-repurposing artifact. On
+three of the four losing configurations, a leaky bidirectional model ``recovers'' a win by seeing
+the future; on the fourth (IEMOCAP-mm), even the leaky upper bound (0.590) stays below the
+transition matrix (0.642), and Pseudo-future-style is in fact a jointly \emph{significant loser}
+there ($\Delta$AUC$=-0.117$; Table~\ref{tab:main} caption) -- inertia dominates so completely that
+no amount of future-peeking, nor an EFC-inspired strategy, is enough.
+
+\textbf{Scope, and why these are not straw men.} Two boundaries should be explicit. First, four of
+our six models re-implement representative context-modeling \emph{families} rather than specific
+published EFC systems (unavailable code); the other two are faithful EFC-inspired-style
+re-implementations. Our claims concern evaluation practice and model families, not any individual
+published number. Second, one may worry the causal re-implementations are artificially weak. Our
+results argue otherwise: (i) six independently implemented paradigms -- plain recurrence,
+speaker-state recurrence, a fixed 6-utterance causal window (DialogueGCN), unbounded causal
+attention (DAG-ERC), and two EFC-inspired strategy baselines -- land within $\lesssim$0.04 AUC of one another
+on \emph{every} dataset despite sharply different receptive fields, and six coincidental bugs do
+not fail in lockstep; (ii) causality was verified directly, not assumed: perturbing all $t\geq n$
+inputs to noise leaves $t<n$ outputs unchanged to floating-point exactness for every model (\S III);
+(iii) the leaky variant of the same pipeline reaches 0.75--0.82 AUC where safe models collapse, so
+it demonstrably learns when signal is available; and (iv) no per-architecture tuning was performed,
+so unequal tuning effort cannot explain the lockstep either.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{Shift-AUC across six dataset-configurations and six causal models. * = degenerate
+(auto-flagged, prediction rate $>$98\% one class). \textbf{Bold} = point estimate exceeds the
+transition matrix. Paired, cluster-robust bootstrap tests, Holm-corrected \emph{jointly} across
+the resulting 36 comparisons (6 models $\times$ 6 datasets): 10/36 survive. All six models' MELD
+losses are jointly significant ($p<.0001$ each) -- the most robust result in the paper. On
+DailyDialog only DAG-ERC's win survives this stringency ($p{=}.001$); GRU's narrowly misses
+($p{=}.002$, threshold $.0019$), and DialogueRNN/DialogueGCN/PEC/Pseudo-future's wins do not clear
+it. Pseudo-future's IEMOCAP-mm loss is jointly significant ($p{=}.001$). All MELD-mm wins and the
+remaining DailyDialog wins are directionally consistent (positive point estimate, all six models)
+but not jointly significant at this stricter threshold; we report this plainly rather than adopt a
+more favorable per-model correction. Full 36-row correction table and per-seed results are in the
+released artifacts.}
+\label{tab:main}
+\begin{tabular}{lcccccccc}\toprule
+Dataset & Transition & GRU & DRNN & DGCN & DAG-ERC & PEC & PseudoFut & Leaky \\
+\midrule
+IEMOCAP      & 0.642 & 0.621  & 0.613  & 0.622  & 0.593  & 0.628 & 0.620 & 0.651 \\
+MELD         & 0.683 & 0.554* & 0.564* & 0.574* & 0.575* & 0.562 & 0.555 & 0.752 \\
+EmoryNLP     & 0.616 & 0.520* & 0.528* & 0.548* & 0.522* & 0.556 & 0.520 & 0.622 \\
+DailyDialog  & 0.695 & \textbf{0.735} & \textbf{0.721} & \textbf{0.726} & \textbf{0.727} & \textbf{0.734} & \textbf{0.728} & 0.816 \\
+IEMOCAP-mm   & 0.642 & 0.569  & 0.569  & 0.553  & 0.557* & 0.576 & 0.563 & 0.590 \\
+MELD-mm      & 0.683 & \textbf{0.725} & \textbf{0.707} & \textbf{0.724} & \textbf{0.718} & \textbf{0.723} & \textbf{0.723} & 0.723 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\textbf{Notes on Table~\ref{tab:main} numbers.} Point-estimate differences will not exactly match
+paired-test $\Delta$AUC values (Table~\ref{tab:main} averages 3 seeds; the paired bootstrap uses a
+single seed's raw predictions, required for well-defined per-utterance pairing) but agree in sign
+and magnitude. DailyDialog's numbers use the \emph{original} (pre-deduplication) split; 13.4\% of
+its test dialogues are exact train duplicates, but a robustness check on the duplicate-free split
+confirms the GRU win survives ($\Delta$AUC $+0.045{\to}+0.038$, both $p<.01$).
+
+\textbf{Feature source, tentatively.} The MELD win/loss flips entirely on feature source at fixed
+architecture: COSMIC RoBERTa text loses ($p<.001$, joint-significant); MM-DFN text+audio+visual
+wins ($p=.021$ uncorrected, not joint-significant). Table~\ref{tab:feat} shows the gain is carried
+by MM-DFN's text channel alone. We identified two candidate explanations without adjudicating
+between them: MM-DFN's 600-d task-adapted textCNN/GloVe encoding may carry a cleaner shift signal
+than COSMIC's 1024-d frozen RoBERTa embedding, \emph{or} the two pipelines' text preprocessing is
+simply not verified to be identical. We did not run a controlled re-extraction to distinguish
+these, so ``feature source rather than architecture'' is reported as a hypothesis, not a
+conclusion.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{MELD feature-source ablation, safe GRU, shift-AUC. The gain over RoBERTa text is carried
+entirely by MM-DFN's text channel; in this logged ablation, audio/visual channels do not
+improve over MM-DFN text-only.}
+\label{tab:feat}
+\begin{tabular}{lc}
+\toprule
+Features & AUC (none) \\
+\midrule
+COSMIC RoBERTa text (1024-d) & 0.554 \\
+MM-DFN text-only (600-d)     & 0.724 \\
+MM-DFN text+audio            & 0.722 \\
+MM-DFN text+visual           & 0.705 \\
+MM-DFN text+audio+visual     & 0.712 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Leakage quantification.} A bidirectional (``leaky'') GRU inflates AUC by $+0.03$ to $+0.20$
+over the safe GRU on the four text corpora (largest on MELD); on the two multimodal configurations
+the gap is $\approx$0 ($+0.02$ and $-0.00$), consistent with the flat dose--response there. A
+capacity-matched causal control (same parameter count) shows the effect is not primarily capacity:
+mean gap shrinks only $0.105{\to}0.092$ under capacity control.
+
+\textbf{Dose--response (Fig.~\ref{fig:dose}).} We sweep $k \in \{0,1,2,4,\infty\}$ future utterances
+visible to the model (mean-pooled window for finite $k$, full bidirectional at $\infty$). The curve
+is \emph{not} a smooth ramp: on MELD/DailyDialog, $k{=}0{\to}1$ (seeing the target utterance itself)
+accounts for most of the windowed inflation (MELD $+0.059$); $k{=}1{\to}4$ is flat or slightly
+declines (averaging in more distant future utterances dilutes the sharp $n{+}1$ signal); a second,
+larger jump appears only at $k{=}\infty$, where each future utterance gets its own backward-pass
+representation rather than being averaged. On IEMOCAP-mm/MELD-mm the curve is flat across the
+\emph{entire} range -- leakage has nothing to add when the honest signal already suffices. One
+caveat: because finite-$k$ leakage is mean-pooled while $k{=}\infty$ is a full bidirectional pass,
+the contrast conflates \emph{access} to the future with its \emph{representation}; we therefore
+claim two operationally distinct leakage modes, not a mechanistic decomposition.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/leakage_dose_response.pdf}
+\caption{Leakage dose--response across six dataset-configurations. Dotted lines mark the
+speaker-transition-matrix baseline per dataset. $k{=}0{\to}1$ (seeing the target utterance) drives
+most of the finite-window inflation; a second jump appears only at full bidirectional context
+($k{=}\infty$).}
+\label{fig:dose}
+\end{figure}
+
+\vspace{-2mm}\section{Findings and Discussion}
+
+Individually these six results are a checklist; together they tell a sharper story.
+
+\begin{enumerate}
+\item Apparent progress on 3/4 text corpora is largely inertia -- a train-fold-only transition
+matrix is a hard baseline current models do not beat when the future is truly hidden.
+\item Standard F1 is degenerate on high-shift-rate corpora; AUC + balanced accuracy are required to
+see it.
+\item Leakage manufactures up to $+0.20$ AUC, is not primarily a capacity artifact, and is largest
+exactly where the legitimate signal is weakest.
+\item Model choice (GRU vs.\ five other structurally and strategically distinct families, including
+two EFC-inspired strategy baselines) contributes negligibly ($\lesssim$0.04 AUC) next to feature choice and
+leakage.
+\item Leakage is (at least) two operationally distinct modes, not one: target-utterance exposure
+and full bidirectional context, with very different inflation profiles.
+\item The two EFC-inspired baselines (PEC-style, Pseudo-future-style) fail in the \emph{identical} pattern
+as ERC-derived architectures -- inertia-dominance is a property of the task and evaluation
+protocol, not an artifact of repurposing recognition architectures.
+\end{enumerate}
+
+The story is not ``nothing works.'' \emph{Whether} a model beats the transition matrix is decided
+almost entirely by where its features come from and how much of the future its evaluation quietly
+admits -- not by which of six strategically distinct models processes those features (Findings 4,
+6). A field that keeps introducing new context-modeling mechanisms and forecasting strategies while
+the real lever is feature source and leakage discipline is optimizing the wrong variable. The dose--response
+curve (Fig.~\ref{fig:dose}, Finding 5) sharpens this: windowed future access inflates numbers far
+less than a bidirectional encoder, but the target utterance alone accounts for most of the damage
+-- the single highest-leverage fix is not a longer checklist, it is masking one utterance
+correctly.
+
+IEMOCAP-mm resists the story on both sides: even the leaky upper bound, even a dedicated
+EFC-inspired baseline, cannot clear the transition matrix -- the cleanest sign that inertia is
+close to the entire signal there. Conversely, the two configurations where safe models win on
+point estimates are not evidence that model choice matters: the MELD comparison (\emph{Feature
+source, tentatively}) shows the identical GRU losing with one feature set and winning with
+another. Progress here, where real, lives in representation choice, not the model on top of it.
+
+\textbf{Limitations.} Our speaker-split concern is only partly addressed: we rule out
+exact-duplicate-dialogue contamination (DailyDialog), but not subtler speaker-identity or
+writing-style leakage in non-duplicate dialogues (MELD/EmoryNLP/DailyDialog speaker IDs are
+per-dialogue local, not verified global identities -- only IEMOCAP is genuinely
+speaker-independent); left to future work, as is the feature-source hypothesis pending a
+controlled re-extraction (\S\ref{sec:exp}).
+
+\vspace{-3mm}\section{Minimal Reporting Checklist}
+
+Standalone checklist for future EFC-forecasting papers: (1) state the commitment point and verify
+no feature crosses it; (2) verify causality directly (e.g.\ a future-perturbation test), not by
+architecture claim alone; (3) report a train-fold-only transition-matrix baseline; (4) report AUC
+and balanced accuracy, not F1 alone, and flag degenerate predictors; (5) use a paired,
+cluster-robust (dialogue-level) significance test, corrected jointly across the full model
+$\times$ dataset family; (6) label any ``leaky'' ablation and exclude it from headline comparisons;
+(7) check train/test for exact-duplicate dialogues before reporting a positive result.
+
+\vspace{-3mm}\section{Conclusion}
+
+How much apparent progress in emotion forecasting survives a protocol that actually hides the
+future? It depends where you look: inertia dominates most standard corpora -- for ERC-derived and
+forecasting-native models alike -- rare wins trace to representation, not model choice, and leakage
+is two operationally distinct modes, not one. None of this required a new model -- only refusing to let the target utterance, or
+anything after it, into the input; similar audits recur wherever architectures built for one
+temporal contract are repurposed for
+another~\cite{kapoor2023leakage,dacrema2019recsys,lin2019neuralhype}. Code and full
+audit: \url{https://github.com/GawaineXiukkie/emotion-forecasting-leakage-audit}.
+
+\begin{thebibliography}{00}
+
+\bibitem{poria2019meld} S. Poria, D. Hazarika, N. Majumder, G. Naik, E. Cambria, and R. Mihalcea,
+``MELD: A multimodal multi-party dataset for emotion recognition in conversations,'' in
+\emph{Proc. ACL}, 2019, pp. 527--536.
+
+\bibitem{busso2008iemocap} C. Busso, M. Bulut, C.-C. Lee, A. Kazemzadeh, E. Mower, S. Kim, J. N.
+Chang, S. Lee, and S. S. Narayanan, ``IEMOCAP: Interactive emotional dyadic motion capture
+database,'' \emph{Language Resources and Evaluation}, vol. 42, no. 4, pp. 335--359, 2008.
+
+\bibitem{zahiri2018emorynlp} S. M. Zahiri and J. D. Choi, ``Emotion detection on TV show
+transcripts with sequence-based convolutional neural networks,'' in \emph{Proc. AAAI Workshop},
+2018.
+
+\bibitem{li2017dailydialog} Y. Li, H. Su, X. Shen, W. Li, Z. Cao, and S. Niu, ``DailyDialog: A
+manually labelled multi-turn dialogue dataset,'' in \emph{Proc. IJCNLP}, 2017, pp. 986--995.
+
+\bibitem{ghosal2020cosmic} D. Ghosal, N. Majumder, A. Gelbukh, R. Mihalcea, and S. Poria, ``COSMIC:
+Commonsense knowledge for emotion identification in conversations,'' in \emph{Findings of EMNLP},
+2020, pp. 2470--2481.
+
+\bibitem{hu2021mmdfn} D. Hu, X. Hou, L. Wei, L. Jiang, and Y. Mo, ``MM-DFN: Multimodal dynamic
+fusion network for emotion recognition in conversations,'' in \emph{Proc. ICASSP}, 2022.
+
+\bibitem{majumder2019dialoguernn} N. Majumder, S. Poria, D. Hazarika, R. Mihalcea, A. Gelbukh, and
+E. Cambria, ``DialogueRNN: An attentive RNN for emotion detection in conversations,'' in
+\emph{Proc. AAAI}, 2019, pp. 6818--6825.
+
+\bibitem{ghosal2019dialoguegcn} D. Ghosal, N. Majumder, S. Poria, N. Chhaya, and A. Gelbukh,
+``DialogueGCN: A graph convolutional neural network for emotion recognition in conversation,'' in
+\emph{Proc. EMNLP-IJCNLP}, 2019, pp. 154--164.
+
+\bibitem{shen2021dagerc} W. Shen, S. Wu, Y. Yang, and X. Quan, ``Directed acyclic graph network for
+conversational emotion recognition,'' in \emph{Proc. ACL-IJCNLP}, 2021.
+
+\bibitem{ai2023dergcn} W. Ai, Y. Shou, T. Meng, and K. Li, ``DER-GCN: Dialogue and event
+relation-aware graph convolutional neural network for multimodal dialogue emotion recognition,''
+\emph{arXiv:2312.10579}, 2023.
+
+\bibitem{zhong2019ket} P. Zhong, D. Wang, and C. Miao, ``Knowledge-enriched transformer for emotion
+detection in textual conversations,'' in \emph{Proc. EMNLP-IJCNLP}, 2019, pp. 165--176.
+
+\bibitem{hu2021dialoguecrn} D. Hu, L. Wei, and X. Huai, ``DialogueCRN: Contextual reasoning
+networks for emotion recognition in conversations,'' in \emph{Proc. ACL-IJCNLP}, 2021.
+
+\bibitem{hazarika2018icon} D. Hazarika, S. Poria, R. Mihalcea, E. Cambria, and R. Zimmermann,
+``ICON: Interactive conversational memory network for multimodal emotion detection,'' in
+\emph{Proc. EMNLP}, 2018, pp. 2594--2604.
+
+\bibitem{tsai2019mult} Y.-H. H. Tsai, S. Bai, P. P. Liang, J. Z. Kolter, L.-P. Morency, and R.
+Salakhutdinov, ``Multimodal Transformer for unaligned multimodal language sequences,'' in
+\emph{Proc. ACL}, 2019, pp. 6558--6569.
+
+\bibitem{hu2021mmgcn} J. Hu, Y. Liu, J. Zhao, and Q. Jin, ``MMGCN: Multimodal fusion via deep graph
+convolution network for emotion recognition in conversation,'' in \emph{Proc. ACL-IJCNLP}, 2021,
+pp. 5666--5675.
+
+\bibitem{hazarika2020misa} D. Hazarika, R. Zimmermann, and S. Poria, ``MISA: Modality-invariant and
+-specific representations for multimodal sentiment analysis,'' in \emph{Proc. ACM MM}, 2020, pp.
+1122--1131.
+
+\bibitem{li2023ga2mif} J. Li, X. Wang, G. Lv, and Z. Zeng, ``GA2MIF: Graph and attention based
+two-stage multi-source information fusion for conversational emotion detection,'' \emph{IEEE
+Trans. Affective Computing}, vol. 15, no. 1, pp. 130--143, 2023.
+
+\bibitem{meng2024mglra} T. Meng, F. Zhang, Y. Shou, H. Shao, W. Ai, and K. Li, ``Masked graph
+learning with recurrent alignment for multimodal emotion recognition in conversation,''
+\emph{IEEE/ACM Trans. Audio, Speech, Lang. Process.}, vol. 32, pp. 4298--4312, 2024.
+
+\bibitem{wang2024hief} H. Wang, X. Mai, Z. Tao, J. Lin, X. Tong, I. Pan, S. Yan, Y. Wang, and S.
+Gao, ``Hi-EF: Benchmarking emotion forecasting in human-interaction,'' \emph{arXiv:2407.16406},
+2024.
+
+\bibitem{altarawneh2023pec} E. Altarawneh, A. Agrawal, M. Jenkin, and M. Papagelis, ``Predicting
+evoked emotions in conversations,'' \emph{arXiv:2401.00383}, 2023.
+
+\bibitem{shi2023epc} X. Shi, X. Li, and T. Toda, ``Emotion awareness in multi-utterance turn for
+improving emotion prediction in multi-speaker conversation,'' in \emph{Proc. Interspeech}, 2023,
+pp. 765--769.
+
+\bibitem{shi2024epc} H. Shi, Z. Liang, and J. Yu, ``Emotional cues extraction and fusion for
+multi-modal emotion prediction and recognition in conversation,'' in \emph{Proc. Interspeech},
+2024, pp. 4074--4078.
+
+\bibitem{ju2023mrepc} X. Ju, D. Zhang, S. Zhu, J. Li, S. Li, and G. Zhou, ``Real-time emotion
+pre-recognition in conversations with contrastive multi-modal dialogue pre-training,'' in
+\emph{Proc. ACM CIKM}, 2023.
+
+\bibitem{xie2025pugcn} Y. Xie, Y. Liu, C. Sun, \emph{et al.}, ``Pseudo-utterance-guided contrastive
+network for emotion forecasting in conversations,'' \emph{Expert Systems with Applications}, vol.
+279, p. 127382, 2025.
+
+\bibitem{lu2023edfc} X. Lu, W. Zhao, Y. Zhao, B. Qin, Z. Zhang, and J. Wen, ``A topic-enhanced
+approach for emotion distribution forecasting in conversations,'' in \emph{Proc. IEEE ICASSP},
+2023.
+
+\bibitem{debsharma2025erfc} A. Debsharma, B. Jagyasi, S. Sen, P. Pandey, D. Dovari, V. C. Yuvaraj,
+R. Parida, and G. Contractor, ``ERFC: Happy customers with emotion recognition and forecasting in
+conversation in call centers,'' \emph{arXiv:2509.18175}, 2025.
+
+\bibitem{gao2022esderc} Q. Gao, B. Cao, X. Guan, T. Gu, X. Bao, J. Wu, B. Liu, and J. Cao, ``Emotion
+recognition in conversations with emotion shift detection based on multi-task learning,''
+\emph{Knowledge-Based Systems}, vol. 248, p. 108861, 2022.
+
+\bibitem{li2024cfnesa} J. Li, Y. Liu, X. Wang, and Z. Zeng, ``CFN-ESA: A cross-modal fusion network
+with emotion-shift awareness for dialogue emotion recognition,'' \emph{IEEE Trans. Affective
+Computing}, vol. 15, no. 4, pp. 1919--1933, 2024.
+
+\bibitem{nirujan2025emoshiftnet} H. Nirujan and Y. H. P. P. Priyadarshana, ``EmoShiftNet: A
+shift-aware multi-task learning framework with fusion strategies for emotion recognition in
+multi-party conversations,'' \emph{Frontiers in Artificial Intelligence}, vol. 8, p. 1618698, 2025.
+
+\bibitem{kumar2023efr} S. Kumar, S. Dudeja, M. S. Akhtar, and T. Chakraborty, ``Emotion flip
+reasoning in multi-party conversations,'' \emph{IEEE Trans. Artificial Intelligence},
+\emph{arXiv:2306.13959}, 2023.
+
+\bibitem{kumar2024ediref} S. Kumar, M. S. Akhtar, E. Cambria, and T. Chakraborty, ``SemEval-2024
+Task 10: Emotion discovery and reasoning its flip in conversation (EDiReF),'' in \emph{Proc. 18th
+SemEval}, 2024, pp. 1933--1946.
+
+\bibitem{kapoor2023leakage} S. Kapoor and A. Narayanan, ``Leakage and the reproducibility crisis in
+machine-learning-based science,'' \emph{Patterns}, vol. 4, no. 9, p. 100804, 2023.
+
+\bibitem{dacrema2019recsys} M. Ferrari Dacrema, P. Cremonesi, and D. Jannach, ``Are we really
+making much progress? A worrying analysis of recent neural recommendation approaches,'' in
+\emph{Proc. ACM RecSys}, 2019, pp. 101--109.
+
+\bibitem{lin2019neuralhype} J. Lin, ``The neural hype and comparisons against weak baselines,''
+\emph{ACM SIGIR Forum}, vol. 52, no. 2, pp. 40--51, 2019.
+
+\end{thebibliography}
+
+\end{document}
