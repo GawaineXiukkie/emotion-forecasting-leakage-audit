@@ -1,152 +1,134 @@
-# Inertia, Leakage, and the Illusion of Progress in Conversational Emotion Forecasting
+# Information-Matched Auditing of Conversational Emotion-Shift Forecasting
 
-Bin Wen, School of Computer Sciences, Universiti Sains Malaysia. Submitted to ICASSP 2027.
-Full paper: [`paper/main.pdf`](paper/main.pdf).
+Bin Wen, School of Computer Sciences, Universiti Sains Malaysia.
 
-This is a measurement paper, not a new method. We re-evaluate emotion-shift forecasting —
-predicting whether the next utterance will carry a different emotion than the current one,
-using only context up to the decision point, with the target utterance itself never seen —
-under a protocol that enforces that constraint structurally, with a strong train-fold-only
-speaker×emotion transition-matrix baseline. The question is how much of the field's apparent
-progress survives once leakage is actually closed off. Runs entirely on a Mac; no GPU needed.
+This repository contains the executable audit and IEEE Access manuscript for leakage-safe
+conversational emotion-shift forecasting. The task is to predict whether the next utterance will
+express a different emotion using only information available after the current turn and before the
+target turn begins.
 
-## Result
+The revision distinguishes two comparisons that should not be conflated:
 
-Six causal models — GRU and causal re-implementations of DialogueRNN, DialogueGCN, and
-DAG-ERC, plus two emotion-forecasting-specific strategy baselines (PEC-style,
-Pseudo-future-style) — land within about 0.03 AUC of each other on every one of six dataset
-configurations. On four of six, every safe model loses to the transition matrix and the only
-way to "win" is to let the model see the future; on one multimodal configuration, even that
-isn't enough. Where safe models do win, the evidence points to feature source rather than
-architecture, though we report that as a hypothesis rather than a settled conclusion. A
-dose-response sweep separates two distinct leakage mechanisms with different inflation
-profiles. Details in `docs/findings.md`.
+- **Deployable:** learned models receive causal utterance features; the transition baseline uses a
+  current-emotion label predicted by a train-only classifier.
+- **Oracle diagnostic:** both learned models and the transition baseline receive gold current
+  emotion. This measures forecasting value conditional on perfectly known current state; it is not
+  a deployment claim.
 
-![Leakage dose-response curve](results/figures/leakage_dose_response.png)
+Every learned family receives the same four-configuration validation search, validation-selected
+checkpoint, and three training seeds. Inference jointly represents seed variability and clustered
+test dialogues. DailyDialog results remove validation/test dialogues exactly duplicated in train.
 
-## Setup
+## Main result
+
+In the deployable comparison, all six causal models improve in point estimate over the
+predicted-label transition baseline on all four primary text corpora. DailyDialog gains are
+`+0.160` to `+0.167` ROC-AUC and survive the joint 72-comparison Holm correction; DialogueRNN's
+smaller MELD gain also survives. In the information-matched oracle diagnostic, the gold-label
+transition matrix remains competitive on IEMOCAP and is stronger on MELD, while all six learned
+models retain large, corrected-significant DailyDialog gains.
+
+The result is therefore conditional, not a universal claim that either architecture or inertia
+always wins. Current-label availability, corpus construction, target definition, feature
+provenance, and leakage discipline materially change the conclusion.
+
+See `results/access_revision_experiments.md` for the complete comparison and
+`docs/access_experiment_protocol.md` for the predeclared analysis rule.
+
+## Environment
+
+The recorded environment is macOS arm64, Python 3.9.6, PyTorch 2.8.0 with MPS, NumPy 2.0.2,
+SciPy 1.13.1, and scikit-learn 1.6.1. Exact package versions are in `requirements-lock.txt` and
+`environment.yml`; the full machine-readable description is in `docs/environment.md`.
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-lock.txt
 ```
 
-Feature files aren't included (see **Data** below for download commands).
+Feature files are not redistributed. Expected filenames and SHA-256 hashes are recorded in
+`docs/data_manifest.sha256`; provenance and locality boundaries are documented in
+`docs/feature_provenance.md`.
 
-## Reproducing the results
+## Reproduction
+
+Run the primary revision first; the self-shift benchmark reuses its selected configurations.
 
 ```bash
-python -m src.experiments               # base benchmark: four architectures, six datasets
-python -m src.efc_baselines              # add the two EFC-inspired baselines
-python -m src.significance_tests         # joint significance test across all six models
-python -m src.check_duplicate_dialogues  # duplicate-dialogue audit + deduplicated re-test
-python -m src.capacity_control           # capacity-matched leakage control
-python -m src.dose_response              # dose-response curve and figure
+python -m src.access_data_quality
+python -m src.check_causality
+python -m unittest discover -s tests -v
+python -m src.access_revision_experiments
+python -m src.access_state_factorized
+python -m src.access_local_feature_control
+python -m src.access_self_shift_benchmark
+python -m src.access_uniform_dose_response
 ```
 
-Each script caches its results per dataset under `results/cache*/` and picks up where it left
-off if interrupted. DailyDialog (13k dialogues) is the slow one; on a Mac, wrapping a run in
-`caffeinate -dims <command>` stops the machine from sleeping mid-run.
+Long runs are resumable from isolated namespaces under `results/cache_access_*`. Search runs do
+not evaluate the test fold. Every final seed stores raw scores, targets, and dialogue identifiers
+in compressed NumPy files for paired re-analysis.
 
 ## Data
 
-Off-the-shelf features only — nothing is extracted from raw audio/video here.
+The primary text features are the released COSMIC RoBERTa pickles from
+[declare-lab/conv-emotion](https://github.com/declare-lab/conv-emotion). The producer scripts for
+IEMOCAP, MELD, and EmoryNLP were audited and operate per utterance. A separate control fits
+TF-IDF vocabulary/IDF and truncated SVD only on training utterances, then transforms each
+utterance independently.
 
-**COSMIC RoBERTa** (text only; IEMOCAP, MELD, EmoryNLP, DailyDialog), from
-[declare-lab/conv-emotion](https://github.com/declare-lab/conv-emotion):
-```bash
-pip install gdown
-gdown 1TQYQYCoPtdXN2rQ1mR2jisjUztmOzfZr -O data/cosmic_features.zip
-unzip -j data/cosmic_features.zip \
-  "erc-training/iemocap/iemocap_features_roberta.pkl" \
-  "erc-training/meld/meld_features_roberta.pkl" \
-  "erc-training/emorynlp/emorynlp_features_roberta.pkl" \
-  "erc-training/dailydialog/dailydialog_features_roberta.pkl" -d data/feat
-```
+MM-DFN IEMOCAP/MELD features are retained only as sensitivity configurations because the release
+does not contain complete feature-producer code. They are not treated as independent primary
+corpora or proof of causal upstream extraction.
 
-**MM-DFN multimodal** (text + OpenSmile audio + DenseNet visual; IEMOCAP, MELD), from
-[zerohd4869/MM-DFN](https://github.com/zerohd4869/MM-DFN):
-```bash
-curl -sL -o data/feat/IEMOCAP_features.pkl \
-  https://raw.githubusercontent.com/zerohd4869/MM-DFN/main/data/iemocap/IEMOCAP_features.pkl
-curl -sL -o data/feat/MELD_features_raw1.pkl \
-  https://raw.githubusercontent.com/zerohd4869/MM-DFN/main/data/meld/MELD_features_raw1.pkl
-```
+Speaker roles in MELD, EmoryNLP, and DailyDialog are dialogue-local and are qualified by dialogue
+ID before transition estimation. IEMOCAP retains its session-and-actor identities. Emotion label
+mappings are listed in `docs/label_mapping.md`.
 
-Pickle layouts are documented next to `_COSMIC_IDX` / `_MMDFN_IDX` in `src/dataset.py`.
-Emotion labels are converted to shift labels (`1[y_{n+1} != y_n]`, speaker-aligned) by
-`src/labels.py`; per-split counts are in `docs/label_conversion.md`.
+## Protocol summary
 
-## Protocol
+- Explicit commitment point and target-absent feature construction.
+- Future-perturbation tests for every causal model implementation.
+- Equal four-trial validation search and early-stopped checkpoint selection.
+- ROC-AUC primary; PR-AUC, Brier, ECE, F1, precision, recall, and balanced accuracy retained.
+- Seed-by-dialogue hierarchical bootstrap with 1,999 replicates.
+- Paired dialogue-cluster permutation with 4,999 sign flips and plus-one p-values.
+- Holm-Bonferroni correction across the declared deployable and oracle comparison family.
+- Complete next-own-utterance self-shift benchmark, not only a prevalence diagnostic.
+- Same-architecture Transformer leakage dose response; only the future-attention mask changes.
 
-- **Causal by construction, checked directly.** Every model is structurally causal (position
-  n never has access to x_{n+1}), and we verify this rather than assume it: perturbing every
-  input at or after the decision point to random noise leaves earlier outputs unchanged to
-  floating-point exactness.
-- **Strong baseline.** A speaker×emotion transition matrix, Laplace-smoothed, train-fold
-  only, with a global backoff for speakers with few training observations
-  (`src/baselines.py`).
-- **One fixed hyperparameter configuration** across all six models — no per-model tuning, so
-  unequal tuning effort can't explain why some models do better than others.
-- **Three fixed seeds (0, 1, 2)** for every model/dataset/config combination, averaged and
-  reported with standard deviation (`src/train.py` default `--seeds 0 1 2`).
-- **Metrics**: shift-AUC as the primary, threshold-free metric, plus F1/precision/recall/
-  balanced accuracy with automatic flagging of degenerate (near-constant) predictors
-  (`src/evaluate.py`).
-- **Significance**: a paired, cluster-robust bootstrap (resampling whole dialogues, not
-  utterances) against the transition matrix, Holm-Bonferroni corrected jointly across all
-  36 model×dataset comparisons (`src/significance_tests.py`).
-- **Automated leakage audit**, an 8-item checklist run on every experiment
-  (`src/leakage_audit.py` → `results/leakage_audit.md`).
-- A bidirectional model (`gru_leaky`) is used only to measure how much leakage inflates the
-  numbers above — never reported as a legitimate result.
+## Paper-to-artifact map
 
-## Paper ↔ repository
+| Evidence | Producer | Reviewable output |
+|---|---|---|
+| Information-matched six-model benchmark | `src/access_revision_experiments.py` | `results/access_revision_experiments.{json,md}` |
+| Data/split/alignment audit | `src/access_data_quality.py` | `results/access_data_quality.{json,md}` |
+| Structural causality | `src/check_causality.py` | `results/causality_check.md` |
+| State-factorized control | `src/access_state_factorized.py` | `results/access_state_factorized.{json,md}` |
+| Independent local features | `src/access_local_feature_control.py` | `results/access_local_feature_control.{json,md}` |
+| Full self-shift benchmark | `src/access_self_shift_benchmark.py` | `results/access_self_shift_benchmark.{json,md}` |
+| Uniform leakage dose | `src/access_uniform_dose_response.py` | `results/access_uniform_dose_response.{json,md}` |
+| Manuscript source | — | `paper/access_submission/manuscript/` |
 
-| Paper artifact | File |
-|---|---|
-| Table I — dataset statistics, F1 degeneracy | `results/dataset_stats.md` |
-| Table II — main result | `results/benchmark_table.md` |
-| Table III — MELD feature-source ablation | `results/feature_ablation_meld.md` |
-| Fig. 1 — leakage dose-response | `results/dose_response.md`, `paper/figures/leakage_dose_response.pdf` |
-| Significance tests (36 comparisons) | `results/significance_tests.md` |
-| Causal construction, robustness checks | `docs/causal_reimplementations.md`, `docs/robustness.md` |
-| Findings, discussion | `docs/findings.md` |
+## Repository status
 
-## Layout
-
-```
-paper/                       submitted PDF and a vector copy of Fig. 1
-src/dataset.py                load COSMIC / MM-DFN pickles, build shift labels
-src/labels.py                 emotion labels -> shift labels (docs/label_conversion.md)
-src/baselines.py              base-rate, no-change, transition matrix, text-history MLP
-src/losses.py                 focal / class-balanced loss
-src/models.py                 causal GRU/TCN/Transformer, the leaky control, LookaheadGRU
-src/models_families.py        causal DialogueRNN, DialogueGCN, DAG-ERC
-src/models_efc_baselines.py   causal PEC-style and Pseudo-future-style models
-src/train.py                  training/eval loop shared by every model
-src/evaluate.py                metrics, dialogue-level bootstrap, paired significance test
-src/leakage_audit.py          automated leakage checklist
-src/experiments.py             main harness: all datasets x the four core architectures
-src/efc_baselines.py          adds the two EFC-inspired baselines to the benchmark
-src/holm_correction.py        Holm-Bonferroni correction
-src/significance_tests.py     joint significance test across all six models
-src/check_duplicate_dialogues.py  duplicate-dialogue audit and deduplicated re-test
-src/capacity_control.py       capacity-matched leakage control
-src/dose_response.py          leakage dose-response curve and figure
-```
+The IEEE Access manuscript is in preparation and is not under consideration at ICASSP. A public
+release/tag must be created from the final reviewed commit before the manuscript can claim an
+immutable public artifact; no tag or DOI is asserted in advance.
 
 ## Citation
 
 ```bibtex
-@inproceedings{wen2027inertia,
-  title     = {Inertia, Leakage, and the Illusion of Progress in Conversational Emotion Forecasting},
-  author    = {Wen, Bin},
-  booktitle = {Proc. IEEE ICASSP},
-  year      = {2027}
+@article{wen2026informationmatched,
+  title   = {Information-Matched Auditing of Conversational Emotion-Shift Forecasting},
+  author  = {Wen, Bin},
+  journal = {IEEE Access},
+  note    = {Manuscript in preparation},
+  year    = {2026}
 }
 ```
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT; see `LICENSE`.

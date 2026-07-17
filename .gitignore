@@ -17,3 +17,9 @@ results_*.txt
 # Local tooling config (not part of the research artifact)
 .claude/
 
+# Scratch workspace and packaging build artifacts (rebuilt on demand, not the artifact itself)
+tmp/
+output/
+results/tmp_*
+results/figures/tmp_*
+

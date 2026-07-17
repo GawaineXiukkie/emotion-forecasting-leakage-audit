@@ -1,39 +1,37 @@
-# Anti-leakage checklist
+# Forecasting validity checklist
 
-Check every item before reporting a number. The distinction between forecasting (this work)
-and shift-aware ERC (recognition, which sees the current utterance) depends on all of them
-holding.
+## Temporal contract
 
-## Temporal boundary
-- [ ] The prediction at decision point `n` uses **only** utterances `≤ n`. The target
-      utterance `n+1` is never an input (text, audio, or visual).
-- [ ] Models are **structurally causal**: unidirectional GRU / left-padded causal TCN /
-      subsequent-masked Transformer. Verified in `src/models.py`.
-- [ ] The last utterance of each dialogue (no successor) is `IGNORE_INDEX`, excluded from
-      loss and metrics.
+- [ ] Decision `n` uses only utterances `<=n`; utterance `n+1` and later are absent.
+- [ ] Future-perturbation tests leave every earlier logit unchanged.
+- [ ] Terminal and padded positions use `IGNORE_INDEX` in every loss and metric.
+- [ ] Any deliberately leaky mask is labeled sensitivity-only and excluded from headline results.
 
-## Per-modality windows
-- [ ] Each cached feature vector for utterance `i` summarizes **only** utterance `i`
-      (off-the-shelf ERC features are per-utterance — confirm for your specific pickle).
-- [ ] No rolling/context feature in the cache spans into `n+1` (confirm with the feature
-      source's README; log if any do and exclude them).
+## Feature provenance
 
-## Current-emotion settings
-- [ ] `oracle` uses gold `y_n` only (current, already happened) — never `y_{n+1}`.
-      Reported as **upper bound only**, not headline.
-- [ ] `predicted` uses `ŷ_n` from a model that itself saw only `x_≤n`
-      (`fill_predicted_current_emotion` predicts `y_n` from `x_n`).
-- [ ] `none` appends no emotion label. Headline = `predicted` + `none`.
+- [ ] Producer code or an independent local extraction establishes utterance scope.
+- [ ] Feature/label/speaker lengths align and all values are finite.
+- [ ] Repeated-text inconsistencies and cross-source ID/text/label alignment are audited.
+- [ ] Externally precomputed features with incomplete producers are labeled sensitivity analyses.
 
-## Splits & statistics
-- [ ] Train/val/test split is by **session/speaker** where applicable (IEMOCAP: by session →
-      test speakers unseen). Logged.
-- [ ] Speaker-specific transition matrix is estimated on the **train fold only**; unseen test
-      speakers fall back to the global train matrix (`src/baselines.py`). No test-speaker
-      ground-truth transition is ever used.
-- [ ] Decision threshold is tuned on **val**, never on test.
-- [ ] Bootstrap CI resamples **dialogues**, not utterances (`src/evaluate.py`).
+## Information matching
 
-## Demo only (never a reported baseline)
-- [ ] A causal-mask-OFF (bidirectional) run may be shown to demonstrate the leakage gap,
-      clearly labeled as leaky. It is excluded from all headline tables.
+- [ ] Deployable transition baselines use train-only predicted current labels.
+- [ ] Oracle models and oracle baselines both receive the same gold current label.
+- [ ] Gold-label diagnostics are not presented as deployable headline comparisons.
+- [ ] Dialogue-local speaker roles are qualified by dialogue ID.
+
+## Selection and inference
+
+- [ ] Hyperparameter budgets are equal and test evaluation is disabled during search.
+- [ ] Checkpoints and operating thresholds are selected on validation only.
+- [ ] All training seeds are retained; inference resamples seeds and whole dialogues.
+- [ ] Paired p-values use a valid null procedure and plus-one correction.
+- [ ] The multiple-comparison family is declared before results are interpreted.
+
+## Reporting
+
+- [ ] Report ROC-AUC, PR-AUC, Brier/ECE, balanced accuracy, F1, and prediction rate.
+- [ ] Name interaction-level versus next-own-utterance self-shift explicitly.
+- [ ] Remove or clearly report exact cross-split dialogue duplicates.
+- [ ] Release masks, split IDs, hashes, raw seed scores, environment locks, and table producers.
