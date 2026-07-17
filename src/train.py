@@ -14,13 +14,14 @@ Run:
 from __future__ import annotations
 
 import argparse
+import copy
 
 import numpy as np
 import torch
 from torch.nn.utils.rnn import pad_sequence
 
 from .dataset import (IGNORE_INDEX, ShiftSplit, assemble_inputs, input_dim,
-                      load_cosmic, load_mmdfn, shift_targets)
+                      load_cosmic, load_mmdfn, targets_for_dialogue)
 from .baselines import (BaseRateBaseline, NoChangeBaseline, SpeakerTransitionMatrix,
                         TextHistoryMLP, collect_shift_arrays, tune_threshold)
 from .losses import make_loss
@@ -39,28 +40,74 @@ def set_seed(s: int):
 
 
 # --------------------------------------------------------------------------- #
-def fill_predicted_current_emotion(split: ShiftSplit, seed: int = 0):
-    """Cheap causal ERC: predict y_n from the CURRENT utterance features x_n (allowed input),
-    train on train fold, fill .predicted_labels on every split. Enables the 'predicted' setting."""
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.pipeline import make_pipeline
+def fill_predicted_current_emotion(split: ShiftSplit, seed: int = 0,
+                                   tune_c: bool = False) -> dict:
+    """Train-only linear ERC for the information-matched deployable baseline.
+
+    The classifier predicts y_n from the current utterance row x_n. Ridge is used
+    because it fits all emotion classes jointly in seconds; the earlier one-vs-rest
+    liblinear implementation required dozens of serial binary fits per seed without
+    changing what information the baseline receives. ``tune_c`` is retained as a
+    backward-compatible flag and selects a validation-tuned ridge-alpha grid.
+    """
+    from sklearn.linear_model import RidgeClassifier
     from sklearn.preprocessing import StandardScaler
 
     def feats(dialogues):
-        return np.concatenate([np.concatenate(list(d.features.values()), axis=1) for d in dialogues], axis=0)
+        return np.concatenate([
+            np.concatenate(list(d.features.values()), axis=1) for d in dialogues
+        ], axis=0).astype(np.float64, copy=False)
 
     Xtr = feats(split.train)
     ytr = np.concatenate([d.labels for d in split.train])
     if len(Xtr) > 20000:  # cap for speed/stability on large corpora (e.g. DailyDialog)
         sel = np.random.default_rng(seed).choice(len(Xtr), 20000, replace=False)
         Xtr, ytr = Xtr[sel], ytr[sel]
-    # StandardScaler before LR: raw RoBERTa features overflow / converge slowly otherwise.
-    clf = make_pipeline(StandardScaler(),
-                        LogisticRegression(max_iter=200, random_state=seed)).fit(Xtr, ytr)
+    # StandardScaler is fitted on training utterances only.
+    alpha_grid = (0.1, 1.0, 10.0, 100.0, 1000.0) if tune_c else (10.0,)
+    Xva = feats(split.val)
+    yva = np.concatenate([d.labels for d in split.val])
+    scaler = StandardScaler().fit(Xtr)
+    Xtr_scaled = scaler.transform(Xtr)
+    Xva_scaled = scaler.transform(Xva)
+
+    def stable_predict(clf, X):
+        """Avoid a macOS Accelerate warning in sklearn's 2-D decision matmul."""
+        coefs = np.atleast_2d(clf.coef_)
+        intercepts = np.atleast_1d(clf.intercept_)
+        decision = np.einsum("ij,kj->ik", X, coefs, optimize=False) + intercepts
+        if len(clf.classes_) == 2:
+            return clf.classes_[(decision[:, 0] > 0).astype(np.int64)]
+        return clf.classes_[np.argmax(decision, axis=1)]
+
+    best = None
+    for alpha in alpha_grid:
+        candidate = RidgeClassifier(alpha=alpha, solver="lsqr").fit(Xtr_scaled, ytr)
+        pred = stable_predict(candidate, Xva_scaled)
+        from sklearn.metrics import accuracy_score, f1_score
+        score = f1_score(yva, pred, average="macro", zero_division=0)
+        row = (float(score), -float(alpha), candidate,
+               float(accuracy_score(yva, pred)), float(alpha))
+        if best is None or row[:2] > best[:2]:
+            best = row
+    assert best is not None
+    _, _, clf, val_acc, selected_alpha = best
     for part in (split.train, split.val, split.test):
         for d in part:
-            X = np.concatenate(list(d.features.values()), axis=1)
-            d.predicted_labels = clf.predict(X).astype(np.int64)
+            X = np.concatenate(list(d.features.values()), axis=1).astype(np.float64, copy=False)
+            d.predicted_labels = stable_predict(clf, scaler.transform(X)).astype(np.int64)
+    test_y = np.concatenate([d.labels for d in split.test])
+    test_pred = np.concatenate([d.predicted_labels for d in split.test])
+    from sklearn.metrics import accuracy_score, f1_score
+    return {
+        "method": "train-only StandardScaler + RidgeClassifier(lsqr)",
+        "selected_alpha": selected_alpha,
+        "training_seed": int(seed),
+        "val_macro_f1": float(best[0]),
+        "val_accuracy": val_acc,
+        "test_macro_f1": float(f1_score(test_y, test_pred, average="macro", zero_division=0)),
+        "test_accuracy": float(accuracy_score(test_y, test_pred)),
+    }
 
 
 MAX_PARTIES = 9  # speaker-aware models index parties 0..MAX_PARTIES-1 (per-dialogue local)
@@ -72,7 +119,7 @@ def build_tensors(dialogues, split: ShiftSplit, current_emotion: str):
     items = []
     for d in dialogues:
         X = assemble_inputs(d, split.modalities, split.num_emotions, current_emotion)
-        y = shift_targets(d.labels)
+        y = targets_for_dialogue(d)
         order = {s: i for i, s in enumerate(dict.fromkeys(d.speakers.tolist()))}
         spk = np.array([order[s] % MAX_PARTIES for s in d.speakers.tolist()], dtype=np.int64)
         items.append((torch.tensor(X), torch.tensor(y), torch.tensor(spk), d.did))
@@ -87,17 +134,23 @@ def pos_weight_from(dialogues) -> float:
 
 
 def train_one(split: ShiftSplit, model_name: str, loss_name: str, current_emotion: str,
-              seed: int, epochs: int = 30, lr: float = 1e-3, batch: int = 32):
+              seed: int, epochs: int = 30, lr: float = 1e-3, batch: int = 32,
+              compute_ci: bool = True, hidden: int = 128, dropout: float = 0.1,
+              early_stopping: bool = False, patience: int = 5, min_epochs: int = 3,
+              track_history: bool = False, model_kwargs: dict | None = None,
+              evaluate_test: bool = True):
     set_seed(seed)
     dev = device()
     d_in = input_dim(split, current_emotion)
-    model = build_model(model_name, d_in).to(dev)
+    model = build_model(model_name, d_in, hidden=hidden, dropout=dropout,
+                        **(model_kwargs or {})).to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = make_loss(loss_name, pos_weight_from(split.train))
 
     train_items = build_tensors(split.train, split, current_emotion)
     val_items = build_tensors(split.val, split, current_emotion)
-    test_items = build_tensors(split.test, split, current_emotion)
+    test_items = (build_tensors(split.test, split, current_emotion)
+                  if evaluate_test else None)
 
     def batches(items, shuffle):
         order = np.random.permutation(len(items)) if shuffle else np.arange(len(items))
@@ -108,16 +161,6 @@ def train_one(split: ShiftSplit, model_name: str, loss_name: str, current_emotio
                              padding_value=IGNORE_INDEX).to(dev)
             spk = pad_sequence([c[2] for c in chunk], batch_first=True, padding_value=0).to(dev)
             yield X, y, spk, [c[3] for c in chunk]
-
-    for _ in range(epochs):
-        model.train()
-        for X, y, spk, _ in batches(train_items, shuffle=True):
-            opt.zero_grad()
-            logits = model(X, spk)
-            loss = loss_fn(logits, y)
-            if hasattr(model, "aux_loss"):   # e.g. CausalPseudoFuture's future-embedding
-                loss = loss + model.aux_loss()  # regression loss; no-op for every other model
-            loss.backward(); opt.step()
 
     # gather scores at valid decision points
     def scores_for(items):
@@ -131,13 +174,57 @@ def train_one(split: ShiftSplit, model_name: str, loss_name: str, current_emotio
                     sc.extend(p[b, valid]); tr.extend(yy[b, valid]); did.extend([d_id] * len(valid))
         return np.array(sc), np.array(tr, dtype=np.int64), np.array(did, dtype=object)
 
+    history = []
+    best_state, best_val_auc, best_epoch = None, -float("inf"), 0
+    stale = 0
+    for epoch in range(epochs):
+        model.train()
+        epoch_losses = []
+        for X, y, spk, _ in batches(train_items, shuffle=True):
+            opt.zero_grad()
+            logits = model(X, spk)
+            loss = loss_fn(logits, y)
+            if hasattr(model, "aux_loss"):   # e.g. CausalPseudoFuture's future-embedding
+                # y[:,:-1] aligns with the auxiliary t->t+1 embedding targets.
+                # The fixed variant masks padded dialogue tails; legacy experiments
+                # intentionally retain their historical behavior for reproducibility.
+                loss = loss + model.aux_loss(y[:, :-1] != IGNORE_INDEX)
+            loss.backward(); opt.step()
+            epoch_losses.append(float(loss.detach().cpu()))
+        if early_stopping or track_history:
+            val_s_epoch, val_y_epoch, _ = scores_for(val_items)
+            from sklearn.metrics import roc_auc_score
+            val_auc = (float(roc_auc_score(val_y_epoch, val_s_epoch))
+                       if len(np.unique(val_y_epoch)) > 1 else float("nan"))
+            history.append({"epoch": epoch + 1,
+                            "train_loss": float(np.mean(epoch_losses)),
+                            "val_auc": val_auc})
+            if not np.isnan(val_auc) and val_auc > best_val_auc + 1e-5:
+                best_val_auc, best_epoch = val_auc, epoch + 1
+                best_state = copy.deepcopy({k: v.detach().cpu() for k, v in model.state_dict().items()})
+                stale = 0
+            else:
+                stale += 1
+            if early_stopping and epoch + 1 >= min_epochs and stale >= patience:
+                break
+
+    if best_state is not None:
+        model.load_state_dict(best_state)
+
     val_s, val_y, _ = scores_for(val_items)
     thr = tune_threshold(val_s, val_y)
+    common = {"threshold": thr, "history": history,
+              "best_val_auc": float(best_val_auc), "best_epoch": int(best_epoch),
+              "epochs_ran": len(history) if history else epochs}
+    if not evaluate_test:
+        return {}, common
     test_s, test_y, test_d = scores_for(test_items)
     m = shift_metrics(test_y, (test_s >= thr).astype(int), test_s)
-    pt, lo, hi = bootstrap_ci(test_y, (test_s >= thr).astype(int), test_s, test_d, "shift_f1", seed=seed)
-    m["shift_f1_ci"] = (pt, lo, hi)
-    extras = {"scores": test_s, "y": test_y, "dids": test_d, "threshold": thr}
+    if compute_ci:
+        pt, lo, hi = bootstrap_ci(test_y, (test_s >= thr).astype(int), test_s, test_d,
+                                  "shift_f1", seed=seed)
+        m["shift_f1_ci"] = (pt, lo, hi)
+    extras = {**common, "scores": test_s, "y": test_y, "dids": test_d}
     return m, extras
 
 

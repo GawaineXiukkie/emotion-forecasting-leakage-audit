@@ -35,9 +35,11 @@ class CausalPEC(nn.Module):
     is effectively a degenerate special case of this term.
     """
     def __init__(self, d_in: int, hidden: int = 128, parties: int = MAX_PARTIES,
-                recency_m: int = 5, recency_decay: float = 0.7, dropout: float = 0.1):
+                recency_m: int = 5, recency_decay: float = 0.7, dropout: float = 0.1,
+                corrected_recency: bool = False):
         super().__init__()
         self.H, self.P, self.M, self.decay = hidden, parties, recency_m, recency_decay
+        self.corrected_recency = corrected_recency
         self.seq_rnn = nn.GRU(d_in, hidden, batch_first=True)
         self.self_cell = nn.GRUCell(d_in, hidden)
         self.recency_proj = nn.Linear(d_in, hidden)
@@ -63,7 +65,15 @@ class CausalPEC(nn.Module):
         h_self = torch.stack(self_states, dim=1)                     # [B,T,H]
 
         # --- recency: causal exponentially-weighted window over the last M utterances ---
-        w = self.decay ** torch.arange(self.M, device=dev, dtype=x.dtype)  # oldest..newest
+        # Legacy experiments used exponents 0..M-1 over an oldest->newest window,
+        # inadvertently giving the oldest item the largest weight.  Keep that path
+        # reproducible under model name ``pec``; ``pec_fixed`` uses the intended
+        # recent-first exponential decay (newest exponent 0, hence weight 1).
+        if self.corrected_recency:
+            exponent = torch.arange(self.M - 1, -1, -1, device=dev, dtype=x.dtype)
+        else:
+            exponent = torch.arange(self.M, device=dev, dtype=x.dtype)
+        w = self.decay ** exponent
         w = w / w.sum()
         pad = torch.zeros(B, self.M - 1, D, device=dev, dtype=x.dtype)
         xpad = torch.cat([pad, x], dim=1)                            # left pad only -> causal
@@ -81,12 +91,14 @@ class CausalPseudoFuture(nn.Module):
     to future data. The model then classifies shift from the causal hidden state concatenated
     with its own predicted future embedding; at inference, no real future data enters the
     input path at any point."""
-    def __init__(self, d_in: int, hidden: int = 128, dropout: float = 0.1, aux_weight: float = 0.1):
+    def __init__(self, d_in: int, hidden: int = 128, dropout: float = 0.1,
+                aux_weight: float = 0.1, mask_aux_padding: bool = False):
         super().__init__()
         self.enc = nn.GRU(d_in, hidden, batch_first=True)
         self.predict_head = nn.Linear(hidden, d_in)
         self.cls_head = nn.Sequential(nn.Dropout(dropout), nn.Linear(hidden + d_in, 1))
         self.aux_weight = aux_weight
+        self.mask_aux_padding = mask_aux_padding
         self._last = None   # (pred, target) cached for aux_loss(), consumed by train.py
 
     def forward(self, x: torch.Tensor, spk=None) -> torch.Tensor:
@@ -100,10 +112,15 @@ class CausalPseudoFuture(nn.Module):
             self._last = None
         return logits
 
-    def aux_loss(self) -> torch.Tensor:
+    def aux_loss(self, valid_mask: torch.Tensor | None = None) -> torch.Tensor:
         """Auxiliary regression loss: MSE between the predicted and real embedding of t+1.
         The real embedding is used only as a label here, never fed into the forward pass."""
         if self._last is None:
             return torch.tensor(0.0)
         pred, target = self._last
+        if self.mask_aux_padding and valid_mask is not None:
+            if not bool(valid_mask.any()):
+                return pred.sum() * 0.0
+            pred = pred[valid_mask]
+            target = target[valid_mask]
         return self.aux_weight * F.mse_loss(pred, target)

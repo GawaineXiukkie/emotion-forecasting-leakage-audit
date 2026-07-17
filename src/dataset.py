@@ -31,12 +31,18 @@ class Dialogue:
     labels: np.ndarray                # [T] int emotion class
     speakers: np.ndarray              # [T] speaker id (string/int); used by transition baseline
     predicted_labels: np.ndarray | None = None  # [T] ŷ_n for the 'predicted' setting
+    custom_shift_targets: np.ndarray | None = None  # optional [T] binary/IGNORE target
+    custom_target_indices: np.ndarray | None = None  # optional [T] future label index
 
     def __post_init__(self):
         T = len(self.labels)
         for m, arr in self.features.items():
             assert arr.shape[0] == T, f"{self.did}: modality {m} has {arr.shape[0]} rows, expected {T}"
         assert len(self.speakers) == T
+        if self.custom_shift_targets is not None:
+            assert len(self.custom_shift_targets) == T
+        if self.custom_target_indices is not None:
+            assert len(self.custom_target_indices) == T
 
 
 @dataclass
@@ -61,7 +67,9 @@ class ShiftSplit:
 # Feature used: roberta1 (1024-d per utterance, independent per utterance -> no future leak).
 # IEMOCAP speaker id is made global (session+gender => the real 10 actors) so the
 # speaker-transition baseline is person-level and the unseen-test-speaker backoff is real.
-# MELD speaker id is the per-dialogue one-hot argmax (local); documented caveat.
+# Non-IEMOCAP speaker IDs are dialogue-qualified local roles. This preserves
+# within-dialogue equality for speaker-aware models while preventing role 0 in
+# unrelated dialogues from being treated as one global person by a baseline.
 # --------------------------------------------------------------------------- #
 _COSMIC_IDX = {
     "iemocap":     dict(speakers=0, labels=1, roberta=(2, 3, 4, 5), sent=6, train=7, test=8, val=9, n_emo=6),
@@ -80,7 +88,11 @@ def find_exact_duplicate_dialogues(path: str | Path, dataset: str) -> dict:
     with open(path, "rb") as f:
         obj = pickle.load(f, encoding="latin1")
     sent = obj[idx["sent"]]
-    train_ids, test_ids, val_ids = obj[idx["train"]], obj[idx["test"]], obj[idx["val"]]
+    # Some upstream pickles store split IDs as sets. Sorting makes cache order
+    # independent of PYTHONHASHSEED and therefore stable across worker processes.
+    train_ids = sorted(obj[idx["train"]], key=str)
+    test_ids = sorted(obj[idx["test"]], key=str)
+    val_ids = sorted(obj[idx["val"]], key=str)
 
     def key(vid):
         return " | ".join(sent[vid])
@@ -111,7 +123,11 @@ def load_cosmic(path: str | Path, dataset: str, feature: str = "roberta1",
     r_idx = idx["roberta"] if feature == "roberta_all" else idx["roberta"][:1]
     speakers, labels = obj[idx["speakers"]], obj[idx["labels"]]
     feat_dicts = [obj[i] for i in r_idx]
-    train_ids, test_ids, val_ids = obj[idx["train"]], obj[idx["test"]], obj[idx["val"]]
+    # Upstream split containers are not uniformly ordered (some are sets).
+    # A stable order is required for portable, self-indexed prediction caches.
+    train_ids = sorted(obj[idx["train"]], key=str)
+    test_ids = sorted(obj[idx["test"]], key=str)
+    val_ids = sorted(obj[idx["val"]], key=str)
 
     if decontaminate:
         sent = obj[idx["sent"]]
@@ -131,10 +147,11 @@ def load_cosmic(path: str | Path, dataset: str, feature: str = "roberta1",
             arr = np.asarray(speakers[vid])
             if dataset == "iemocap":                    # 'M'/'F' -> global actor (session+gender)
                 spk = np.array([_iemocap_speaker(vid, s) for s in speakers[vid]], dtype=object)
-            elif arr.ndim == 2:                         # one-hot [T,n] -> local index (meld, emorynlp)
-                spk = arr.argmax(axis=1).astype(object)
-            else:                                       # scalar per utterance (dailydialog 0/1)
-                spk = arr.astype(object)
+            elif arr.ndim == 2:                         # one-hot [T,n] -> dialogue-local role
+                local = arr.argmax(axis=1)
+                spk = np.array([f"{vid}::role_{int(s)}" for s in local], dtype=object)
+            else:                                       # scalar dialogue-local role (DailyDialog)
+                spk = np.array([f"{vid}::role_{s}" for s in arr], dtype=object)
             out.append(Dialogue(did=str(vid), features={"text": X},
                                 labels=np.asarray(labels[vid], dtype=np.int64), speakers=spk))
         return out
@@ -189,7 +206,8 @@ def load_mmdfn(path: str | Path, dataset: str,
             if dataset == "iemocap":
                 spk = np.array([_iemocap_speaker(vid, s) for s in raw_spk], dtype=object)
             else:
-                spk = np.asarray(raw_spk).argmax(axis=1).astype(object)
+                local = np.asarray(raw_spk).argmax(axis=1)
+                spk = np.array([f"{vid}::role_{int(s)}" for s in local], dtype=object)
             out.append(Dialogue(did=str(vid), features=feats,
                                 labels=np.asarray(labels[vid], dtype=np.int64), speakers=spk))
         return out
@@ -208,6 +226,38 @@ def shift_targets(labels: np.ndarray) -> np.ndarray:
     if T >= 2:
         s[:-1] = (labels[1:] != labels[:-1]).astype(np.int64)
     return s
+
+
+def targets_for_dialogue(d: Dialogue) -> np.ndarray:
+    return (d.custom_shift_targets if d.custom_shift_targets is not None
+            else shift_targets(d.labels))
+
+
+def target_index_for_dialogue(d: Dialogue, n: int) -> int:
+    if d.custom_target_indices is not None:
+        idx = int(d.custom_target_indices[n])
+        if idx < 0:
+            raise ValueError(f"{d.did}:{n} has no valid custom target index")
+        return idx
+    return n + 1
+
+
+def apply_self_shift_target(dialogues: list[Dialogue]) -> None:
+    """Set n -> current speaker's next-own-utterance target in place."""
+    for d in dialogues:
+        T = len(d.labels)
+        targets = np.full(T, IGNORE_INDEX, dtype=np.int64)
+        indices = np.full(T, -1, dtype=np.int64)
+        next_for = {}
+        for n in range(T - 1, -1, -1):
+            speaker = d.speakers[n]
+            if speaker in next_for:
+                j = next_for[speaker]
+                indices[n] = j
+                targets[n] = int(d.labels[j] != d.labels[n])
+            next_for[speaker] = n
+        d.custom_shift_targets = targets
+        d.custom_target_indices = indices
 
 
 def assemble_inputs(d: Dialogue, modalities: tuple[str, ...], num_emotions: int,

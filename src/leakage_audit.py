@@ -10,6 +10,10 @@ import numpy as np
 from .dataset import IGNORE_INDEX, ShiftSplit, shift_targets
 
 
+SAFE_MODELS = {"gru", "tcn", "transformer", "dialoguernn", "dialoguegcn", "dagerc",
+               "pec", "pseudofuture", "gru_wide", "gru_look0"}
+
+
 def _speakers(dialogues) -> set:
     s = set()
     for d in dialogues:
@@ -23,9 +27,11 @@ def audit(split: ShiftSplit, dataset: str, model_name: str = "gru") -> dict:
     last_ignored = bool(shift_targets(sample.labels)[-1] == IGNORE_INDEX)
 
     # 2. model is structurally causal (the safe protocol); gru_leaky is the leak demo
-    causal = model_name in ("gru", "tcn", "transformer")
+    causal = model_name in SAFE_MODELS
 
-    # 3. features are per-utterance (row count == #utterances) -> no window crosses into n+1
+    # 3. cached rows align one-to-one with utterances. This verifies container structure,
+    # not the internals of the upstream feature extractor; source provenance is documented
+    # separately in docs/leakage_checklist.md.
     per_utt = all(arr.shape[0] == len(d.labels)
                   for d in split.test for arr in d.features.values())
 
@@ -53,6 +59,8 @@ def audit(split: ShiftSplit, dataset: str, model_name: str = "gru") -> dict:
         "speaker_overlap": len(overlap),
         "note": ("speaker-independent" if speaker_independent
                  else "speaker ids overlap (local per-dialogue ids; identity not global here)"),
+        "feature_scope_note": ("row alignment verified; upstream extractor provenance must "
+                               "also establish that each row uses one utterance only"),
         "all_structural_pass": all(v for k, v in checks.items() if not k.startswith("4_")),
     }
 

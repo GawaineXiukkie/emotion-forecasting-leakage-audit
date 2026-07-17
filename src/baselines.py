@@ -18,14 +18,15 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .dataset import Dialogue, IGNORE_INDEX, shift_targets
+from .dataset import (Dialogue, IGNORE_INDEX, target_index_for_dialogue,
+                      targets_for_dialogue)
 
 
 # --------------------------------------------------------------------------- #
 def iter_decision_points(dialogues: list[Dialogue]):
     """Yield (dialogue, n) for every valid decision point (has a successor)."""
     for d in dialogues:
-        s = shift_targets(d.labels)
+        s = targets_for_dialogue(d)
         for n in np.where(s != IGNORE_INDEX)[0]:
             yield d, int(n)
 
@@ -36,7 +37,7 @@ def collect_shift_arrays(dialogues: list[Dialogue]):
     for d, n in iter_decision_points(dialogues):
         y_n.append(int(d.labels[n]))
         spk_n.append(d.speakers[n])
-        shift.append(int(d.labels[n + 1] != d.labels[n]))
+        shift.append(int(targets_for_dialogue(d)[n]))
     return np.asarray(y_n), np.asarray(spk_n, dtype=object), np.asarray(shift, dtype=np.int64)
 
 
@@ -75,7 +76,8 @@ class SpeakerTransitionMatrix:
 
     def fit(self, train_dialogues: list[Dialogue]):
         for d, n in iter_decision_points(train_dialogues):
-            j, k, spk = int(d.labels[n]), int(d.labels[n + 1]), d.speakers[n]
+            target_idx = target_index_for_dialogue(d, n)
+            j, k, spk = int(d.labels[n]), int(d.labels[target_idx]), d.speakers[n]
             self.per_speaker.setdefault(spk, np.zeros((self.K, self.K)))[j, k] += 1
             self.global_counts[j, k] += 1
         return self
@@ -93,9 +95,22 @@ class SpeakerTransitionMatrix:
         p = self._row_prob(counts, j)
         return float(1.0 - p[j])                    # P(next != current)
 
-    def predict_score(self, dialogues: list[Dialogue]) -> np.ndarray:
+    def predict_score(self, dialogues: list[Dialogue], use_predicted_labels: bool = False) -> np.ndarray:
         y_n, spk_n, _ = collect_shift_arrays(dialogues)
+        if use_predicted_labels:
+            rows = []
+            for d, n in iter_decision_points(dialogues):
+                if d.predicted_labels is None:
+                    raise ValueError(f"{d.did}: predicted labels are required")
+                rows.append(int(d.predicted_labels[n]))
+            y_n = np.asarray(rows, dtype=np.int64)
         return np.array([self._shift_prob_for(int(j), s) for j, s in zip(y_n, spk_n)])
+
+
+class PredictedLabelTransitionMatrix(SpeakerTransitionMatrix):
+    """Deployable transition baseline using train-only ERC predictions at test time."""
+    def predict_score(self, dialogues: list[Dialogue]) -> np.ndarray:
+        return super().predict_score(dialogues, use_predicted_labels=True)
 
 
 # --------------------------------------------------------------------------- #
@@ -103,7 +118,7 @@ def _pooled_text_history(dialogues: list[Dialogue], modality: str = "text") -> n
     """Mean-pool features of utterances 0..n (inclusive) at each decision point."""
     rows = []
     for d in dialogues:
-        s = shift_targets(d.labels)
+        s = targets_for_dialogue(d)
         X = d.features.get(modality)
         if X is None:  # fallback: concat all modalities
             X = np.concatenate(list(d.features.values()), axis=1)
