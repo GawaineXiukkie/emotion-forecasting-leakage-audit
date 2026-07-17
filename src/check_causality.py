@@ -1,6 +1,7 @@
 """
-Direct causality check for all six models: perturb every input at or after the decision
-point to random noise and confirm outputs strictly before it are unchanged.
+Direct causality check for the six headline models plus the optional TCN and Transformer:
+perturb every input at or after the decision point to random noise and confirm outputs
+strictly before it are unchanged.
 
 This is the check the paper's Protocol section describes: "perturbing every input at t >= n
 to random noise leaves outputs at t < n changed by exactly 0.0 (floating-point identical) for
@@ -14,16 +15,18 @@ from __future__ import annotations
 
 import torch
 
-from .models import build_model
+from .models import CausalStateFactorizedForecaster, build_model
 
 MODELS = ["gru", "tcn", "transformer", "dialoguernn", "dialoguegcn", "dagerc",
-         "pec", "pseudofuture"]
+         "pec", "pseudofuture", "pec_fixed", "pseudofuture_fixed",
+         "transformer_future0", "state_factorized"]
 CUTPOINT = 5
 
 
 def check_one(name: str, d_in: int = 16, T: int = 10, B: int = 2, seed: int = 0) -> float:
     torch.manual_seed(seed)
-    model = build_model(name, d_in)
+    model = (CausalStateFactorizedForecaster(d_in, num_emotions=4)
+             if name == "state_factorized" else build_model(name, d_in))
     model.eval()
     x = torch.randn(B, T, d_in)
     spk = torch.randint(0, 3, (B, T))
@@ -31,7 +34,9 @@ def check_one(name: str, d_in: int = 16, T: int = 10, B: int = 2, seed: int = 0)
         logits_a = model(x.clone(), spk)
         x_perturbed = x.clone()
         x_perturbed[:, CUTPOINT:, :] = torch.randn(B, T - CUTPOINT, d_in) * 100
-        logits_b = model(x_perturbed, spk)
+        spk_perturbed = spk.clone()
+        spk_perturbed[:, CUTPOINT:] = torch.randint(0, 3, (B, T - CUTPOINT))
+        logits_b = model(x_perturbed, spk_perturbed)
     return (logits_a[:, :CUTPOINT] - logits_b[:, :CUTPOINT]).abs().max().item()
 
 
@@ -50,7 +55,9 @@ def main():
         all_causal &= causal
         lines.append(f"| {name} | {diff:.2e} | {'yes' if causal else 'NO -- LEAK'} |")
         print(f"{name:14s} max_diff={diff:.2e}  {'causal' if causal else 'LEAK'}", flush=True)
-    lines += ["", "All six models pass." if all_causal else
+    lines += ["", f"All {len(MODELS)} checked models pass (the six benchmark families, "
+             "corrected EFC variants, optional causal encoders, the k=0 dose control, and "
+             "the state-factorized forecaster)." if all_causal else
              "WARNING: at least one model is not causal -- see the table above."]
     open("results/causality_check.md", "w").write("\n".join(lines) + "\n")
     print("Wrote results/causality_check.md")

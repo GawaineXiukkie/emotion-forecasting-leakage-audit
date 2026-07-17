@@ -8,9 +8,8 @@ family models -- is reused from src/experiments.py's cache; only PEC-style and P
 style are trained here. Results are merged directly into results/cache/<ds>.json so
 results/benchmark_table.md and the joint significance test pick them up without a full rerun.
 
-Run:  python -m src.efc_baselines
-Then: python -m src.experiments --force     # regenerate the table with the new rows
-      python -m src.significance_tests      # extend the joint test to all six models
+Run:  python -m src.efc_baselines            # also refreshes the main benchmark table
+Then: python -m src.significance_tests       # extend the joint test to all six models
 """
 from __future__ import annotations
 
@@ -19,7 +18,7 @@ import os
 
 from .baselines import collect_shift_arrays
 from .evaluate import paired_bootstrap_auc, summarize_seeds
-from .experiments import COSMIC, MMDFN, load_split
+from .experiments import COSMIC, MMDFN, load_split, write_table
 from .train import run_baselines, train_one
 
 NEW_MODELS = ["pec", "pseudofuture"]
@@ -85,7 +84,12 @@ def main():
         results[ds] = run_one(ds)
         merge_into_main_cache(ds, results[ds])
     json.dump(results, open("results/efc_baselines.json", "w"), indent=2)
-    print("Wrote results/efc_baselines.json and merged rows into results/cache/*.json")
+    merged = {ds: json.load(open(f"results/cache/{ds}.json"))
+              for ds in all_datasets if os.path.exists(f"results/cache/{ds}.json")}
+    if merged:
+        write_table(merged)
+    print("Wrote results/efc_baselines.json, merged rows into results/cache/*.json, "
+          "and refreshed results/benchmark_table.md")
 
 
 if __name__ == "__main__":
