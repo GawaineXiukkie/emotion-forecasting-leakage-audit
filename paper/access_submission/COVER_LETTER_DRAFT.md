@@ -50,5 +50,4 @@ on behalf of Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan
 School of Computer Sciences  
 Universiti Sains Malaysia  
 11800 Gelugor, Penang, Malaysia  
-tienping@usm.my  
-[INSERT ORCID]
+tienping@usm.my

@@ -94,7 +94,7 @@ def main():
         "on behalf of Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan<br/>"
         "School of Computer Sciences<br/>"
         "Universiti Sains Malaysia<br/>11800 Gelugor, Penang, Malaysia<br/>"
-        "tienping@usm.my<br/><font color='#9A0000'>[INSERT ORCID]</font>", body
+        "tienping@usm.my", body
     )]
     doc.build(story)
     print(f"Wrote {OUT}")
