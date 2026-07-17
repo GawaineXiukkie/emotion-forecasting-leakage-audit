@@ -1087,6 +1087,28 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 Package hyperref Warning: The anchor of a bookmark and its parent's must not
 (hyperref)                be the same. Added a new anchor on input line 1056.
 
+File: author_photos/bin_wen.png Graphic file (type bmp)
+<author_photos/bin_wen.png>
+File: author_photos/bin_wen.png Graphic file (type bmp)
+<author_photos/bin_wen.png>
+
+Underfull \hbox (badness 1412) in paragraph at lines 1056--1066
+[]\T1/times/n/n/8 His cur-rent re-search in-ter-ests in-clude mul-ti-
+ []
+
+
+Underfull \hbox (badness 1648) in paragraph at lines 1056--1066
+\T1/times/n/n/8 hance-ment, con-ver-sa-tional emo-tion fore-cast-ing,
+ []
+
+File: author_photos/dai_qiao_zhang.png Graphic file (type bmp)
+<author_photos/dai_qiao_zhang.png>
+File: author_photos/dai_qiao_zhang.png Graphic file (type bmp)
+<author_photos/dai_qiao_zhang.png>
+File: author_photos/tien_ping_tan.png Graphic file (type bmp)
+<author_photos/tien_ping_tan.png>
+File: author_photos/tien_ping_tan.png Graphic file (type bmp)
+<author_photos/tien_ping_tan.png>
 File: bullet.png Graphic file (type bmp)
 <bullet.png>
 
@@ -1117,4 +1139,4 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 3AA0CEFC4F8DE1FB6B036810C2153860;3177.
  )
-Output written on main.xdv (11 pages, 111204 bytes).
+Output written on main.xdv (11 pages, 111704 bytes).
