@@ -87,8 +87,9 @@ def main():
         "any other journal or conference. All authors have approved the manuscript and agree with "
         "its submission to IEEE Access.", body), p(
         "The authors have disclosed the use of OpenAI Codex for language editing, LaTeX formatting, "
-        "code review, and assistance with supplementary analyses. The authors reviewed and verified "
-        "all content, code, results, and conclusions and assume full responsibility.", body
+        "code review, and the documentation and presentation of supplementary analyses. All "
+        "experimental designs, executions, interpretations, and conclusions were independently "
+        "reviewed and verified by the authors, who assume full responsibility.", body
     ), p("Thank you for your consideration.", body), Spacer(1, 2 * mm), p(
         "Sincerely,<br/><br/><b>Tien-Ping Tan</b> (corresponding author)<br/>"
         "on behalf of Bin Wen, Dai-Qiao Zhang, and Tien-Ping Tan<br/>"

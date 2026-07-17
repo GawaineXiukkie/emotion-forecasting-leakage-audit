@@ -37,9 +37,9 @@ other journal or conference. All authors have approved the manuscript and agree 
 submission to IEEE Access.
 
 The authors have disclosed the use of OpenAI Codex for language editing, LaTeX formatting,
-code review, and assistance with supplementary analyses. The authors reviewed and verified
-all manuscript content, code, results, and conclusions and assume full responsibility for
-the work.
+code review, and the documentation and presentation of supplementary analyses. All experimental
+designs, executions, interpretations, and conclusions were independently reviewed and verified
+by the authors, who assume full responsibility for the work.
 
 Thank you for your consideration.
 

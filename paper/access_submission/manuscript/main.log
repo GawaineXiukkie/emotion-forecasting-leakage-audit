@@ -1068,7 +1068,7 @@ File: notaglinelogo.png Graphic file (type bmp)
 <notaglinelogo.png>
 
 LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
-(Font)              using `T1/formata/m/it' instead on input line 989.
+(Font)              using `T1/formata/m/it' instead on input line 985.
 
 
 Overfull \hbox (505.12177pt too wide) has occurred while \output is active
@@ -1135,11 +1135,36 @@ Underfull \hbox (badness 10000) has occurred while \output is active
 []
  []
 
-[11] (main.aux)
+[11]
+File: notaglinelogo.png Graphic file (type bmp)
+<notaglinelogo.png>
+
+
+LaTeX Font Warning: Font shape `T1/formata/m/sl' undefined
+(Font)              using `T1/formata/m/it' instead on input line 1102.
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Overfull \hbox (505.12177pt too wide) has occurred while \output is active
+[]
+ []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+ []
+
+[12
+
+] (main.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 3AA0CEFC4F8DE1FB6B036810C2153860;3177.
  )
-Output written on main.xdv (11 pages, 113652 bytes).
+Output written on main.xdv (12 pages, 114304 bytes).
